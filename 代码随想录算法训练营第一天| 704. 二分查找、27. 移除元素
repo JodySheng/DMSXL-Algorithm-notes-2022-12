@@ -40,13 +40,16 @@ while(left < right):
 时间复杂度：O(\log n)O(logn)，其中 n是数组的长度。
 空间复杂度：O(1)
 
-
-
   
 注意：
 1. while <= or >=?
 2. right = middle / middle - 1?
 2. 区别index和nums[index]
+
+35.搜索插入位置(opens new window)
+34.在排序数组中查找元素的第一个和最后一个位置(opens new window)
+69.x 的平方根
+367.有效的完全平方数
 
 
 lc27 移除元素
@@ -124,3 +127,8 @@ class Solution {
 链接：https://leetcode.cn/problems/remove-element/solution/yi-chu-yuan-su-by-leetcode-solution-svxi/
 来源：力扣（LeetCode）
 
+相关题目推荐
+26.删除排序数组中的重复项
+283.移动零
+844.比较含退格的字符串
+977.有序数组的平方
