@@ -7,3 +7,120 @@ Day1 数组
 数组可以方便的通过下标索引的方式获取到下标下对应的数据。
 * 数组下标都是从0开始的。
 * 数组内存空间的地址是连续的
+
+lc704 二分法
+视频：https://www.bilibili.com/video/BV1fA4y1o715/?vd_source=f981ac6c1b14789ee827d427f90dd339
+
+a. [left, right]
+left = 0
+right = size - 1
+while(left <= right): //[left, right]
+  mid = (left - right) / 2 //注意越界
+  if num[mid] > target:
+    right = mid - 1 //[left, right]
+  elif num[mid] < target:
+    left = mid + 1 //[left, right]
+  else:
+    return mid
+  return -1
+ 
+b. [left, right)
+left = 0
+right = size //**
+while(left < right): 
+  mid = (left - right) / 2 
+  if num[mid] > target:
+    right = mid   // **
+  elif num[mid] < target: // **
+    left = mid + 1 
+  else:
+    return mid
+  return -1
+  
+时间复杂度：O(\log n)O(logn)，其中 n是数组的长度。
+空间复杂度：O(1)
+
+
+
+  
+注意：
+1. while <= or >=?
+2. right = middle / middle - 1?
+2. 区别index和nums[index]
+
+
+lc27 移除元素
+https://www.bilibili.com/video/BV12A4y1Z7LP/?vd_source=f981ac6c1b14789ee827d427f90dd339
+数组的元素在内存地址中是连续的，不能单独删除数组中的某个元素，只能覆盖。
+
+暴力解法
+// 时间复杂度：O(n^2)
+// 空间复杂度：O(1)
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int size = nums.size();
+        for (int i = 0; i < size; i++) {
+            if (nums[i] == val) { // 发现需要移除的元素，就将数组集体向前移动一位
+                for (int j = i + 1; j < size; j++) {
+                    nums[j - 1] = nums[j];
+                }
+                i--; // 因为下标i以后的数值都向前移动了一位，所以i也向前移动一位
+                size--; // 此时数组的大小-1
+            }
+        }
+        return size;
+
+    }
+};
+
+
+mine：
+  class Solution:
+      def removeElement(self, nums: List[int], val: int) -> int:
+          n = len(nums)
+          indx = 0
+          for i in range(n):
+              if nums[i] != val:
+                  nums[indx] = nums[i]
+                  indx += 1
+
+
+          return indx
+
+  双指针：       
+  class Solution:
+      def removeElement(self, nums: List[int], val: int) -> int:
+          if len(nums) == 0: return 0
+
+          n = len(nums)
+          left = 0
+          for right in range(n):
+              if nums[right] != val:
+                  nums[left] = nums[right]
+                  left += 1
+
+          return left
+  time: O(N)
+  space:O(1)
+  
+双向双指针优化
+class Solution {
+    public int removeElement(int[] nums, int val) {
+        int left = 0;
+        int right = nums.length;
+        while (left < right) {
+            if (nums[left] == val) {
+                nums[left] = nums[right - 1];
+                right--;
+            } else {
+                left++;
+            }
+        }
+        return left;
+    }
+}
+作者：LeetCode-Solution
+链接：https://leetcode.cn/problems/remove-element/solution/yi-chu-yuan-su-by-leetcode-solution-svxi/
+来源：力扣（LeetCode）
+
