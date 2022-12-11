@@ -1,0 +1,152 @@
+数组总结
+https://programmercarl.com/%E6%95%B0%E7%BB%84%E6%80%BB%E7%BB%93%E7%AF%87.html#%E6%A8%A1%E6%8B%9F%E8%A1%8C%E4%B8%BA
+# 977 有序数组的平方 
+题目建议： 本题关键在于理解双指针思想 
+
+题目链接：https://leetcode.cn/problems/squares-of-a-sorted-array/
+文章讲解：https://programmercarl.com/0977.%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E5%B9%B3%E6%96%B9.html
+视频讲解： https://www.bilibili.com/video/BV1QB4y1D7ep 
+
+暴力：
+class Solution {
+public:
+    vector<int> sortedSquares(vector<int>& A) {
+        for (int i = 0; i < A.size(); i++) {
+            A[i] *= A[i];
+        }
+        sort(A.begin(), A.end()); // 快速排序
+        return A;
+    }
+};
+时间复杂度：O(n \log n)O(nlogn)，其中 nn 是数组 \textit{nums}nums 的长度。
+空间复杂度：O(\log n)O(logn)。除了存储答案的数组以外，我们需要 O(\log n)O(logn) 的栈空间进行排序。
+作者：LeetCode-Solution
+链接：https://leetcode.cn/problems/squares-of-a-sorted-array/solution/you-xu-shu-zu-de-ping-fang-by-leetcode-solution/
+来源：力扣（LeetCode）
+
+
+class Solution:
+    def sortedSquares(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        result = [0] * n
+        i = 0
+        j = n - 1
+        k = n - 1
+        while i <= j:
+            if nums[i] * nums[i] > nums[j] * nums[j]:
+                result[k] = nums[i] * nums[i]
+                k -= 1
+                i += 1
+            else:
+                result[k] = nums[j] * nums[j]
+                k -= 1
+                j -= 1
+
+        return result
+        
+time：O(n)
+space:O(1)
+
+# 209.长度最小的子数组 
+
+题目链接：https://leetcode.cn/problems/minimum-size-subarray-sum/
+文章讲解：https://programmercarl.com/0209.%E9%95%BF%E5%BA%A6%E6%9C%80%E5%B0%8F%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84.html
+视频讲解：https://www.bilibili.com/video/BV1tZ4y1q7XE
+
+# 两个for循环， 暴力
+class Solution:
+    def minSubArrayLen(self, s: int, nums: List[int]) -> int:
+        if not nums:
+            return 0
+        
+        n = len(nums)
+        ans = n + 1
+        for i in range(n):
+            total = 0
+            for j in range(i, n):
+                total += nums[j]
+                if total >= s:
+                    ans = min(ans, j - i + 1)
+                    break
+        
+        return 0 if ans == n + 1 else ans
+        
+时间复杂度：O(n^2)，其中 nn 是数组的长度。需要遍历每个下标作为子数组的开始下标，对于每个开始下标，需要遍历其后面的下标得到长度最小的子数组。
+
+空间复杂度：O(1)O(1)。
+
+作者：LeetCode-Solution
+链接：https://leetcode.cn/problems/minimum-size-subarray-sum/solution/chang-du-zui-xiao-de-zi-shu-zu-by-leetcode-solutio/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+# 一个for循环， j是结束位置
+class Solution:
+    def minSubArrayLen(self, target: int, nums: List[int]) -> int:
+        n = len(nums)
+        j = 0
+        i = 0
+        result = n+1
+        sum = 0
+        while j < n:
+            sum += nums[j]
+            while sum >= target:
+                result = min(result, j - i + 1)
+                sum -= nums[i]
+                i += 1
+            j += 1
+
+
+        if result == float("inf"):
+            return 0
+
+        return 0 if result == n+1 else result
+时间复杂度：O(n)，其中 nn 是数组的长度。指针 \textit{start} 和 \textit{end} 最多各移动 n 次。
+
+空间复杂度：O(1)。
+
+作者：LeetCode-Solution
+链接：https://leetcode.cn/problems/minimum-size-subarray-sum/solution/chang-du-zui-xiao-de-zi-shu-zu-by-leetcode-solutio/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+904.水果成篮(opens new window)
+76.最小覆盖子串(opens new window)
+#
+
+# 59.螺旋矩阵II
+题目链接：https://leetcode.cn/problems/spiral-matrix-ii/
+文章讲解：https://programmercarl.com/0059.%E8%9E%BA%E6%97%8B%E7%9F%A9%E9%98%B5II.html
+视频讲解：https://www.bilibili.com/video/BV1SL4y1N7mV/
+
+
+54.螺旋矩阵
+剑指Offer 29.顺时针打印矩阵
+# 左闭右开
+class Solution:
+    def generateMatrix(self, n: int) -> List[List[int]]:
+        nums = [[0] * n for _ in range(n)]
+        startx, starty = 0, 0               # 起始点
+        loop, mid = n // 2, n // 2          # 迭代次数、n为奇数时，矩阵的中心点
+        count = 1                           # 计数
+
+        for offset in range(1, loop + 1) :      # 每循环一层偏移量加1，偏移量从1开始
+            for i in range(starty, n - offset) :    # 从左至右，左闭右开
+                nums[startx][i] = count
+                count += 1
+            for i in range(startx, n - offset) :    # 从上至下
+                nums[i][n - offset] = count
+                count += 1
+            for i in range(n - offset, starty, -1) : # 从右至左
+                nums[n - offset][i] = count
+                count += 1
+            for i in range(n - offset, startx, -1) : # 从下至上
+                nums[i][starty] = count
+                count += 1                
+            startx += 1         # 更新起始点
+            starty += 1
+
+        if n % 2 != 0 :			# n为奇数时，填充中心点
+            nums[mid][mid] = count 
+        return nums
+
+
