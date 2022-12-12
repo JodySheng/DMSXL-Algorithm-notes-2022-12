@@ -1,0 +1,175 @@
+链表基础知识 https://programmercarl.com/%E9%93%BE%E8%A1%A8%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80.html#%E5%8D%95%E9%93%BE%E8%A1%A8
+
+链表是一种通过指针串联在一起的线性结构，每一个节点由两部分组成，一个是数据域一个是指针域（存放指向下一个节点的指针），最后一个节点的指针域指向null（空指针的意思）。
+
+链表的入口节点称为链表的头结点也就是head。
+
+链表的几种类型:
+
+#单链表
+刚刚说的就是单链表。
+
+#双链表
+单链表中的指针域只能指向节点的下一个节点。
+
+双链表：每一个节点有两个指针域，一个指向下一个节点，一个指向上一个节点。
+
+双链表 既可以向前查询也可以向后查询。
+
+#循环链表
+循环链表，顾名思义，就是链表首尾相连。
+
+循环链表可以用来解决约瑟夫环问题。
+
+#链表的存储方式
+了解完链表的类型，再来说一说链表在内存中的存储方式。
+
+数组是在内存中是连续分布的，但是链表在内存中可不是连续分布的。
+
+链表是通过指针域的指针链接在内存中各个节点。
+
+所以链表中的节点在内存中不是连续分布的 ，而是散乱分布在内存中的某地址上，分配机制取决于操作系统的内存管理。
+
+#链表的定义
+class ListNode:
+    def __init__(self, val, next=None):
+        self.val = val
+        self.next = next
+
+链表的操作
+#删除节点
+
+只要将C节点的next指针 指向E节点就可以了。
+
+那有同学说了，D节点不是依然存留在内存里么？只不过是没有在这个链表里而已。
+
+是这样的，所以在C++里最好是再手动释放这个D节点，释放这块内存。
+
+其他语言例如Java、Python，就有自己的内存回收机制，就不用自己手动释放了。
+
+#添加节点
+可以看出链表的增添和删除都是O(1)操作，也不会影响到其他节点。
+
+但是要注意，要是删除第五个节点，需要从头节点查找到第四个节点通过next指针进行删除操作，查找的时间复杂度是O(n)。
+
+#性能分析
+再把链表的特性和数组的特性进行一个对比，如图所示：
+数组在定义的时候，长度就是固定的，如果想改动数组的长度，就需要重新定义一个新的数组。
+
+链表的长度可以是不固定的，并且可以动态增删， 适合数据量不固定，频繁增删，较少查询的场景。
+
+203.移除链表元素  
+
+建议： 本题最关键是要理解 虚拟头结点的使用技巧，这个对链表题目很重要。
+
+题目链接/文章讲解/视频讲解：：https://programmercarl.com/0203.%E7%A7%BB%E9%99%A4%E9%93%BE%E8%A1%A8%E5%85%83%E7%B4%A0.html
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def removeElements(self, head: ListNode, val: int) -> ListNode:
+        dummy_head = ListNode(next=head) #添加一个虚拟节点
+        cur = dummy_head
+        while(cur.next!=None):
+            if(cur.next.val == val):
+                cur.next = cur.next.next #删除cur.next节点
+            else:
+                cur = cur.next
+        return dummy_head.next
+       
+       
+707.设计链表  
+建议： 这是一道考察 链表综合操作的题目，不算容易，可以练一练 使用虚拟头结点
+
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0707.%E8%AE%BE%E8%AE%A1%E9%93%BE%E8%A1%A8.html
+
+# 操作的点是cur.next
+# 加入点是先加右边，再加左边
+class Node:
+  def __init__(self, x=0):
+      self.val = x
+      self.next = None
+
+class MyLinkedList:
+
+    def __init__(self):
+        self.head = Node()
+        self.size = 0
+        
+
+    def get(self, index: int) -> int:
+        if index < 0 or index >= self.size: return -1
+
+        cur = self.head.next
+        while index:
+            cur = cur.next
+            index -= 1
+        # if not cur.val: return -1
+        return cur.val
+        
+
+    def addAtHead(self, val: int) -> None:
+        node = Node(val)
+       
+        node.next = self.head.next
+        self.head.next = node
+        self.size += 1
+        
+
+    def addAtTail(self, val: int) -> None:
+        node = Node(val)
+        cur = self.head
+        while cur.next:
+            cur= cur.next
+        cur.next = node
+        self.size += 1
+
+
+    def addAtIndex(self, index: int, val: int) -> None:
+        if index == self.size: 
+            self.addAtTail(val) 
+            return
+        if index > self.size: return
+
+
+        node = Node(val)
+        cur = self.head
+
+        while index:
+            cur = cur.next  
+            index -= 1
+        node.next = cur.next
+        cur.next = node
+        self.size += 1
+        
+
+    def deleteAtIndex(self, index: int) -> None:
+        if index < 0 or index >= self.size:
+            return
+        cur = self.head
+
+        while index:
+            cur = cur.next
+            index -= 1
+        
+        cur.next = cur.next.next
+        self.size -= 1
+        
+
+
+# Your MyLinkedList object will be instantiated and called as such:
+# obj = MyLinkedList()
+# param_1 = obj.get(index)
+# obj.addAtHead(val)
+# obj.addAtTail(val)
+# obj.addAtIndex(index,val)
+# obj.deleteAtIndex(index)
+
+206.反转链表 
+
+建议先看我的视频讲解，视频讲解中对 反转链表需要注意的点讲的很清晰了，看完之后大家的疑惑基本都解决了。
+
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0206.%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8.html 
