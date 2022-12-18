@@ -21,6 +21,8 @@ class Solution:
 19.删除链表的倒数第N个节点      
 双指针的操作，要注意，删除第N个节点，那么我们当前遍历的指针一定要指向 第N个节点的前一个节点，建议先看视频。
 题目链接/文章讲解/视频讲解：
+https://programmercarl.com/0019.%E5%88%A0%E9%99%A4%E9%93%BE%E8%A1%A8%E7%9A%84%E5%80%92%E6%95%B0%E7%AC%ACN%E4%B8%AA%E8%8A%82%E7%82%B9.html
+
 class Solution:
     def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
         dummy = ListNode()
@@ -37,3 +39,64 @@ class Solution:
         
         slow.next = slow.next.next
         return dummy.next
+       
+面试题 02.07. 链表相交
+同：160.链表相交
+题目链接/文章讲解：https://programmercarl.com/%E9%9D%A2%E8%AF%95%E9%A2%9802.07.%E9%93%BE%E8%A1%A8%E7%9B%B8%E4%BA%A4.html
+简单来说，就是求两个链表交点节点的指针。 这里同学们要注意，交点不是数值相等，而是指针相等。
+为了方便举例，假设节点元素数值相等，则节点指针相等。
+看如下两个链表，目前curA指向链表A的头结点，curB指向链表B的头结点：
+我们求出两个链表的长度，并求出两个链表长度的差值，然后让curA移动到，和curB 末尾对齐的位置，此时我们就可以比较curA和curB是否相同，如果不相同，同时向后移动curA和curB，如果遇到curA == curB，则找到交点。
+否则循环退出返回空指针。
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
+        lenA, lenB = 0, 0
+        cur = headA
+        while cur:         # 求链表A的长度
+            cur = cur.next 
+            lenA + 1
+        cur = headB 
+        while cur:         # 求链表B的长度
+            cur = cur.next 
+            lenB += 1
+        curA, curB = headA, headB
+        if lenA > lenB:     # 让curB为最长链表的头，lenB为其长度
+            curA, curB = curB, curA
+            lenA, lenB = lenB, lenA 
+        for _ in range(lenB - lenA):  # 让curA和curB在同一起点上（末尾位置对齐）
+            curB = curB.next 
+        while curA:         #  遍历curA 和 curB，遇到相同则直接返回
+            if curA == curB:
+                return curA
+            else:
+                curA = curA.next 
+                curB = curB.next
+        return None 
+  
+142.环形链表II  
+
+算是链表比较有难度的题目，需要多花点时间理解 确定环和找环入口，建议先看视频。
+
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0142.%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8II.html
+
+1.找到相遇的点，fast走两步，slow走一步。
+2.找到cycle的入口，X = Z
+
+class Solution:
+    def detectCycle(self, head: ListNode) -> ListNode:
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            # 如果相遇
+            if slow == fast:
+                p = head
+                q = slow
+                while p!=q:
+                    p = p.next
+                    q = q.next
+                #你也可以return q
+                return p
+
+        return None
+
