@@ -137,3 +137,36 @@ class Solution:
 350.两个数组的交集 II
 
 
+202. 快乐数 
+
+建议：这道题目也是set的应用，其实和上一题差不多，就是 套在快乐数一个壳子 
+
+题目链接/文章讲解：https://programmercarl.com/0202.%E5%BF%AB%E4%B9%90%E6%95%B0.html  
+
+注：无限循环，set， 对取数值各个位上的单数操作不熟悉
+
+class Solution:
+    def isHappy(self, n: int) -> bool:
+        def calculate_happy(num):
+            sum_ = 0
+            
+            # 从个位开始依次取，平方求和
+            while num:
+                sum_ += (num % 10) ** 2
+                num = num // 10
+            return sum_
+
+        # 记录中间结果
+        record = set()
+
+        while True:
+            n = calculate_happy(n)
+            if n == 1:
+                return True
+            
+            # 如果中间结果重复出现，说明陷入死循环了，该数不是快乐数
+            if n in record:
+                return False
+            else:
+                record.add(n)
+
