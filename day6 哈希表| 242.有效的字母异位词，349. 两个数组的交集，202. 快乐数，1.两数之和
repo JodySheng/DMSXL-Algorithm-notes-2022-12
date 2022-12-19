@@ -61,3 +61,79 @@ std::unordered_map 底层实现为哈希表，std::map 和std::multimap 的底�
 这里在说一下，一些C++的经典书籍上 例如STL源码剖析，说到了hash_set hash_map，这个与unordered_set，unordered_map又有什么关系呢？
 
 实际上功能都是一样一样的， 但是unordered_set在C++11的时候被引入标准库了，而hash_set并没有，所以建议还是使用unordered_set比较好，这就好比一个是官方认证的，hash_set，hash_map 是C++11标准之前民间高手自发造的轮子。
+
+
+242.有效的字母异位词 
+
+建议： 这道题目，大家可以感受到 数组 用来做哈希表 给我们带来的遍历之处。 
+
+题目链接/文章讲解/视频讲解： https://programmercarl.com/0242.%E6%9C%89%E6%95%88%E7%9A%84%E5%AD%97%E6%AF%8D%E5%BC%82%E4%BD%8D%E8%AF%8D.html  
+
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        if len(s) != len(t): return False
+
+        lst = [0] * 26
+        for i in s:
+            lst[ord(i) - ord("a")] += 1
+        
+        for j in t:
+            lst[ord(j) - ord("a")] -= 1
+            if lst[ord(j) - ord("a")] < 0:
+                return False
+        
+
+        return True
+        
+Python写法二（没有使用数组作为哈希表，只是介绍defaultdict这样一种解题思路）：
+
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        from collections import defaultdict
+        
+        s_dict = defaultdict(int)
+        t_dict = defaultdict(int)
+
+        for x in s:
+            s_dict[x] += 1
+        
+        for x in t:
+            t_dict[x] += 1
+
+        return s_dict == t_dict
+
+Python写法三(没有使用数组作为哈希表，只是介绍Counter这种更方便的解题思路)：
+
+class Solution(object):
+    def isAnagram(self, s: str, t: str) -> bool:
+        from collections import Counter
+        a_count = Counter(s)
+        b_count = Counter(t)
+        return a_count == b_count
+383.赎金信(opens new window)
+49.字母异位词分组
+438.找到字符串中所有字母异位词
+
+349. 两个数组的交集 
+
+建议：本题就开始考虑 什么时候用set 什么时候用数组，本题其实是使用set的好题，但是后来力扣改了题目描述和 测试用例，添加了 0 <= nums1[i], nums2[i] <= 1000 条件，所以使用数组也可以了，不过建议大家忽略这个条件。 尝试去使用set。 
+
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0349.%E4%B8%A4%E4%B8%AA%E6%95%B0%E7%BB%84%E7%9A%84%E4%BA%A4%E9%9B%86.html
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        val_dict = {}
+        ans = []
+        for num in nums1:
+            val_dict[num] = 1
+
+        for num in nums2:
+            if num in val_dict.keys() and val_dict[num] == 1:
+                ans.append(num)
+                val_dict[num] = 0
+        
+        return ans
+
+相关题目
+350.两个数组的交集 II
+
+
