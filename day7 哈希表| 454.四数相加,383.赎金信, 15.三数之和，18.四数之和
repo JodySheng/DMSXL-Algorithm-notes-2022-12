@@ -1,0 +1,154 @@
+454.四数相加II 
+建议：本题是 使用map 巧妙解决的问题，好好体会一下 哈希法 如何提高程序执行效率，降低时间复杂度，当然使用哈希法 会提高空间复杂度，但一般来说我们都是舍空间 换时间， 工业开发也是这样。
+题目链接/文章讲解/视频讲解：
+class Solution(object):
+    def fourSumCount(self, nums1, nums2, nums3, nums4):
+        # use a dict to store the elements in nums1 and nums2 and their sum
+        hashmap = dict()
+        for n1 in nums1:
+            for n2 in nums2:
+                if n1 + n2 in hashmap:
+                    hashmap[n1+n2] += 1
+                else:
+                    hashmap[n1+n2] = 1
+        
+        # if the -(a+b) exists in nums3 and nums4, we shall add the count
+        count = 0
+        for n3 in nums3:
+            for n4 in nums4:
+                key = - n3 - n4
+                if key in hashmap:
+                    count += hashmap[key]
+        return count
+
+383. 赎金信  
+建议：本题 和 242.有效的字母异位词 是一个思路 ，算是拓展题 
+题目链接/文章讲解：https://programmercarl.com/0383.%E8%B5%8E%E9%87%91%E4%BF%A1.html
+
+class Solution:
+    def canConstruct(self, ransomNote: str, magazine: str) -> bool:
+        dict = collections.defaultdict(int)
+        for ch in magazine:
+            dict[ch] += 1
+        for ch in ransomNote:
+            dict[ch] -= 1
+            if dict[ch] < 0:
+                return False
+        
+        return True
+
+15. 三数之和 
+建议：本题虽然和 两数之和 很像，也能用哈希法，但用哈希法会很麻烦，双指针法才是正解，可以先看视频理解一下 双指针法的思路，文章中讲解的，没问题 哈希法很麻烦。 
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0015.%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C.html
+class Solution:
+    def threeSum(self, nums):
+        ans = []
+        n = len(nums)
+        nums.sort()
+	# 找出a + b + c = 0
+        # a = nums[i], b = nums[left], c = nums[right]
+        for i in range(n):
+            left = i + 1
+            right = n - 1
+	    # 排序之后如果第一个元素已经大于零，那么无论如何组合都不可能凑成三元组，直接返回结果就可以了
+            if nums[i] > 0: 
+                break
+            if i >= 1 and nums[i] == nums[i - 1]: # 去重a
+                continue
+            while left < right:
+                total = nums[i] + nums[left] + nums[right]
+                if total > 0:
+                    right -= 1
+                elif total < 0:
+                    left += 1
+                else:
+                    ans.append([nums[i], nums[left], nums[right]])
+		    # 去重逻辑应该放在找到一个三元组之后，对b 和 c去重
+                    while left != right and nums[left] == nums[left + 1]: left += 1
+                    while left != right and nums[right] == nums[right - 1]: right -= 1
+                    left += 1
+                    right -= 1
+        return ans
+        
+18. 四数之和  
+建议： 要比较一下，本题和 454.四数相加II 的区别，为什么 454.四数相加II 会简单很多，这个想明白了，对本题理解就深刻了。 本题 思路整体和 三数之和一样的，都是双指针，但写的时候 有很多小细节，需要注意，建议先看视频。 
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0018.%E5%9B%9B%E6%95%B0%E4%B9%8B%E5%92%8C.html
+
+我们来回顾一下，几道题目使用了双指针法。
+
+双指针法将时间复杂度：O(n^2)的解法优化为 O(n)的解法。也就是降一个数量级，题目如下：
+
+27.移除元素(opens new window)
+15.三数之和(opens new window)
+18.四数之和(opens new window)
+链表相关双指针题目：
+
+206.反转链表(opens new window)
+19.删除链表的倒数第N个节点(opens new window)
+面试题 02.07. 链表相交(opens new window)
+142题.环形链表II(opens new window)
+双指针法在字符串题目中还有很多应用，后面还会介绍到。
+# 双指针法
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        
+        nums.sort()
+        n = len(nums)
+        res = []
+        for i in range(n):   
+            if i > 0 and nums[i] == nums[i - 1]: continue  # 对nums[i]去重
+            for k in range(i+1, n):
+                if k > i + 1 and nums[k] == nums[k-1]: continue  # 对nums[k]去重
+                p = k + 1
+                q = n - 1
+
+                while p < q:
+                    if nums[i] + nums[k] + nums[p] + nums[q] > target: q -= 1
+                    elif nums[i] + nums[k] + nums[p] + nums[q] < target: p += 1
+                    else:
+                        res.append([nums[i], nums[k], nums[p], nums[q]])
+			# 对nums[p]和nums[q]去重
+                        while p < q and nums[p] == nums[p + 1]: p += 1
+                        while p < q and nums[q] == nums[q - 1]: q -= 1
+                        p += 1
+                        q -= 1
+        return res
+ 
+ # 哈希表法
+class Solution(object):
+    def fourSum(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[List[int]]
+        """
+        # use a dict to store value:showtimes
+        hashmap = dict()
+        for n in nums:
+            if n in hashmap:
+                hashmap[n] += 1
+            else: 
+                hashmap[n] = 1
+        
+        # good thing about using python is you can use set to drop duplicates.
+        ans = set()
+        # ans = []  # save results by list()
+        for i in range(len(nums)):
+            for j in range(i + 1, len(nums)):
+                for k in range(j + 1, len(nums)):
+                    val = target - (nums[i] + nums[j] + nums[k])
+                    if val in hashmap:
+                        # make sure no duplicates.
+                        count = (nums[i] == val) + (nums[j] == val) + (nums[k] == val)
+                        if hashmap[val] > count:
+                          ans_tmp = tuple(sorted([nums[i], nums[j], nums[k], val]))
+                          ans.add(ans_tmp)
+                          # Avoiding duplication in list manner but it cause time complexity increases
+                          # if ans_tmp not in ans:  
+                          #     ans.append(ans_tmp)
+                        else:
+                            continue
+        return list(ans) 
+        # if used list() to save results, just 
+        # return ans
+
