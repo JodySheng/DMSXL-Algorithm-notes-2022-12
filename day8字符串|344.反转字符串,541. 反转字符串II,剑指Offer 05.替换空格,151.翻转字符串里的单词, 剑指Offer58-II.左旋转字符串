@@ -50,3 +50,56 @@ class Solution:
             s = s[:p] + s[p: p2][::-1] + s[p2:]
             p = p + 2 * k
         return s
+ 
+ 
+剑指Offer 05.替换空格 
+建议：对于线性数据结构，填充或者删除，后序处理会高效的多。好好体会一下。
+题目链接/文章讲解：https://programmercarl.com/%E5%89%91%E6%8C%87Offer05.%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC.html  
+时算上本题，我们已经做了七道双指针相关的题目了分别是：
+
+27.移除元素(opens new window)
+15.三数之和(opens new window)
+18.四数之和(opens new window)
+206.翻转链表(opens new window)
+142.环形链表II(opens new window)
+344.反转字符串(opens new window)
+
+class Solution:
+    def replaceSpace(self, s: str) -> str:
+        counter = s.count(' ')
+        
+        res = list(s)
+        # 每碰到一个空格就多拓展两个格子，1 + 2 = 3个位置存’%20‘
+        res.extend([' '] * counter * 2)
+        
+        # 原始字符串的末尾，拓展后的末尾
+        left, right = len(s) - 1, len(res) - 1
+        
+        while left >= 0:
+            if res[left] != ' ':
+                res[right] = res[left]
+                right -= 1
+            else:
+                # [right - 2, right), 左闭右开
+                res[right - 2: right + 1] = '%20'
+                right -= 3
+            left -= 1
+        return ''.join(res)
+        
+class Solution:
+    def replaceSpace(self, s: str) -> str:
+        # method 1 - Very rude
+        return "%20".join(s.split(" "))
+
+        # method 2 - Reverse the s when counting in for loop, then update from the end.
+        n = len(s)
+        for e, i in enumerate(s[::-1]):
+            print(i, e)
+            if i == " ":
+                s = s[: n - (e + 1)] + "%20" + s[n - e:]
+            print("")
+        return s
+151.翻转字符串里的单词 
+建议：这道题目基本把 刚刚做过的字符串操作 都覆盖了，不过就算知道解题思路，本题代码并不容易写，要多练一练。 
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0151.%E7%BF%BB%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%87%8C%E7%9A%84%E5%8D%95%E8%AF%8D.html
+
