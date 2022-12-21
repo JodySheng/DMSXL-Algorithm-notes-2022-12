@@ -1,3 +1,52 @@
 344.反转字符串 
 建议： 本题是字符串基础题目，就是考察 reverse 函数的实现，同时也明确一下 平时刷题什么时候用 库函数，什么时候 不用库函数 
+class Solution:
+    def reverseString(self, s: List[str]) -> None:
+        """
+        Do not return anything, modify s in-place instead.
+        """
+        left, right = 0, len(s) - 1
+        
+        # 该方法已经不需要判断奇偶数，经测试后时间空间复杂度比用 for i in range(right//2)更低
+        # 推荐该写法，更加通俗易懂
+        while left < right:
+            s[left], s[right] = s[right], s[left]
+            left += 1
+            right -= 1
 
+541. 反转字符串II
+建议：本题又进阶了，自己先去独立做一做，然后在看题解，对代码技巧会有很深的体会。 
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0541.%E5%8F%8D%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2II.html
+
+class Solution:
+    def reverseStr(self, s: str, k: int) -> str:
+        """
+        1. 使用range(start, end, step)来确定需要调换的初始位置
+        2. 对于字符串s = 'abc'，如果使用s[0:999] ===> 'abc'。字符串末尾如果超过最大长度，则会返回至字符串最后一个值，这个特性可以避免一些边界条件的处理。
+        3. 用切片整体替换，而不是一个个替换.
+        """
+        def reverse_substring(text):
+            left, right = 0, len(text) - 1
+            while left < right:
+                text[left], text[right] = text[right], text[left]
+                left += 1
+                right -= 1
+            return text
+        
+        res = list(s)
+
+        for cur in range(0, len(s), 2 * k):
+            res[cur: cur + k] = reverse_substring(res[cur: cur + k])
+        
+        return ''.join(res)
+        
+class Solution:
+    def reverseStr(self, s: str, k: int) -> str:
+        # Two pointers. Another is inside the loop.
+        p = 0
+        while p < len(s):
+            p2 = p + k
+            # Written in this could be more pythonic.
+            s = s[:p] + s[p: p2][::-1] + s[p2:]
+            p = p + 2 * k
+        return s
