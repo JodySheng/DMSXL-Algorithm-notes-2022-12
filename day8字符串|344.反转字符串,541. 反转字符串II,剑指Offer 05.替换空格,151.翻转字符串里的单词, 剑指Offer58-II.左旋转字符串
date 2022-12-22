@@ -1,3 +1,6 @@
+
+###151
+
 344.反转字符串 
 建议： 本题是字符串基础题目，就是考察 reverse 函数的实现，同时也明确一下 平时刷题什么时候用 库函数，什么时候 不用库函数 
 class Solution:
@@ -103,3 +106,177 @@ class Solution:
 建议：这道题目基本把 刚刚做过的字符串操作 都覆盖了，不过就算知道解题思路，本题代码并不容易写，要多练一练。 
 题目链接/文章讲解/视频讲解：https://programmercarl.com/0151.%E7%BF%BB%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%87%8C%E7%9A%84%E5%8D%95%E8%AF%8D.html
 
+
+class Solution:
+  #1.去除多余的空格
+        def trim_spaces(self, s):     
+            n = len(s)
+            left = 0
+            right = n-1
+        
+            while left <= right and s[left] == ' ':    #去除开头的空格
+                left += 1
+            while left <= right and s[right] == ' ':   #去除结尾的空格
+                right = right-1
+            tmp = []
+            while left <= right:                      #去除单词中间多余的空格
+                if s[left] != ' ':
+                    tmp.append(s[left])
+                elif tmp[-1] != ' ':                 #当前位置是空格，但是相邻的上一个位置不是空格，则该空格是合理的
+                    tmp.append(s[left])
+                left += 1
+            return tmp
+	    
+ #2.翻转字符数组
+        def reverse_string(self, nums, left, right):
+            while left < right:
+                nums[left], nums[right] = nums[right], nums[left]
+                left += 1
+                right -= 1
+            return None
+	    
+ #3.翻转每个单词
+        def reverse_each_word(self, nums):
+            start = 0
+            end = 0
+            n = len(nums)
+            while start < n:
+                while end < n and nums[end] != ' ':
+                    end += 1
+                self.reverse_string(nums, start, end-1)
+                start = end + 1
+                end += 1
+            return None
+
+#4.翻转字符串里的单词
+        def reverseWords(self, s):                #测试用例："the sky is blue"
+            l = self.trim_spaces(s)               #输出：['t', 'h', 'e', ' ', 's', 'k', 'y', ' ', 'i', 's', ' ', 'b', 'l', 'u', 'e'
+            self.reverse_string(l,  0, len(l)-1)  #输出：['e', 'u', 'l', 'b', ' ', 's', 'i', ' ', 'y', 'k', 's', ' ', 'e', 'h', 't']
+            self.reverse_each_word(l)             #输出：['b', 'l', 'u', 'e', ' ', 'i', 's', ' ', 's', 'k', 'y', ' ', 't', 'h', 'e']
+            return ''.join(l)                    #输出：blue is sky the
+
+
+class Solution:
+    def reverseWords(self, s: str) -> str:
+        # method 1 - Rude but work & efficient method.
+        s_list = [i for i in s.split(" ") if len(i) > 0]
+        return " ".join(s_list[::-1])
+
+        # method 2 - Carlo's idea
+        def trim_head_tail_space(ss: str):
+            p = 0
+            while p < len(ss) and ss[p] == " ":
+                p += 1
+            return ss[p:]
+
+        # Trim the head and tail space
+        s = trim_head_tail_space(s)
+        s = trim_head_tail_space(s[::-1])[::-1]
+
+        pf, ps, s = 0, 0, s[::-1] # Reverse the string.
+        while pf < len(s):
+            if s[pf] == " ":
+                # Will not excede. Because we have clean the tail space.
+                if s[pf] == s[pf + 1]:
+                    s = s[:pf] + s[pf + 1:]
+                    continue
+                else:
+                    s = s[:ps] + s[ps: pf][::-1] + s[pf:]
+                    ps, pf = pf + 1, pf + 2
+            else:
+                pf += 1
+        return s[:ps] + s[ps:][::-1] # Must do the last step, because the last word is omit though the pointers are on the correct positions,
+所以这里我还是提高一下本题的难度：不要使用辅助空间，空间复杂度要求为O(1)。
+不能使用辅助空间之后，那么只能在原字符串上下功夫了。
+想一下，我们将整个字符串都反转过来，那么单词的顺序指定是倒序了，只不过单词本身也倒序了，那么再把单词反转一下，单词不就正过来了。
+所以解题思路如下：
+移除多余空格
+将整个字符串反转
+将每个单词反转
+举个例子，源字符串为："the sky is blue "
+移除多余空格 : "the sky is blue"
+字符串反转："eulb si yks eht"
+单词反转："blue is sky the"
+class Solution {
+public:
+    void reverse(string& s, int start, int end){ //翻转，区间写法：左闭又闭 []
+        for (int i = start, j = end; i < j; i++, j--) {
+            swap(s[i], s[j]);
+        }
+    }
+
+    void removeExtraSpaces(string& s) {//去除所有空格并在相邻单词之间添加空格, 快慢指针。
+        int slow = 0;   //整体思想参考https://programmercarl.com/0027.移除元素.html
+        for (int i = 0; i < s.size(); ++i) { //
+            if (s[i] != ' ') { //遇到非空格就处理，即删除所有空格。
+                if (slow != 0) s[slow++] = ' '; //手动控制空格，给单词之间添加空格。slow != 0说明不是第一个单词，需要在单词前添加空格。
+                while (i < s.size() && s[i] != ' ') { //补上该单词，遇到空格说明单词结束。
+                    s[slow++] = s[i++];
+                }
+            }
+        }
+        s.resize(slow); //slow的大小即为去除多余空格后的大小。
+    }
+
+    string reverseWords(string s) {
+        removeExtraSpaces(s); //去除多余空格，保证单词之间之只有一个空格，且字符串首尾没空格。
+        reverse(s, 0, s.size() - 1);
+        int start = 0; //removeExtraSpaces后保证第一个单词的开始下标一定是0。
+        for (int i = 0; i <= s.size(); ++i) {
+            if (i == s.size() || s[i] == ' ') { //到达空格或者串尾，说明一个单词结束。进行翻转。
+                reverse(s, start, i - 1); //翻转，注意是左闭右闭 []的翻转。
+                start = i + 1; //更新下一个单词的开始下标start
+            }
+        }
+        return s;
+    }
+};
+
+剑指Offer58-II.左旋转字符串 
+建议：题解中的解法如果没接触过的话，应该会想不到
+题目链接/文章讲解：https://programmercarl.com/%E5%89%91%E6%8C%87Offer58-II.%E5%B7%A6%E6%97%8B%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2.html  
+思路
+为了让本题更有意义，提升一下本题难度：不能申请额外空间，只能在本串上操作。
+不能使用额外空间的话，模拟在本串操作要实现左旋转字符串的功能还是有点困难的。
+那么我们可以想一下上一题目字符串：花式反转还不够！ (opens new window)中讲过，使用整体反转+局部反转就可以实现反转单词顺序的目的。
+这道题目也非常类似，依然可以通过局部反转+整体反转 达到左旋转的目的。
+具体步骤为：
+反转区间为前n的子串
+反转区间为n到末尾的子串
+反转整个字符串
+最后就可以达到左旋n的目的，而不用定义新的字符串，完全在本串上操作。
+
+# 方法一：可以使用切片方法
+class Solution:
+    def reverseLeftWords(self, s: str, n: int) -> str:
+        return s[n:] + s[0:n]
+        
+# 方法二：也可以使用上文描述的方法，有些面试中不允许使用切片，那就使用上文作者提到的方法
+class Solution:
+    def reverseLeftWords(self, s: str, n: int) -> str:
+        s = list(s)
+        s[0:n] = list(reversed(s[0:n]))
+        s[n:] = list(reversed(s[n:]))
+        s.reverse()
+        
+        return "".join(s)
+        
+# 方法三：如果连reversed也不让使用，那么自己手写一个
+class Solution:
+    def reverseLeftWords(self, s: str, n: int) -> str:
+        def reverse_sub(lst, left, right):
+            while left < right:
+                lst[left], lst[right] = lst[right], lst[left]
+                left += 1
+                right -= 1
+        
+        res = list(s)
+        end = len(res) - 1
+        reverse_sub(res, 0, n - 1)
+        reverse_sub(res, n, end)
+        reverse_sub(res, 0, end)
+        return ''.join(res)
+
+# 同方法二
+# 时间复杂度：O(n)
+# 空间复杂度：O(n)，python的string为不可变，需要开辟同样大小的list空间来修改
