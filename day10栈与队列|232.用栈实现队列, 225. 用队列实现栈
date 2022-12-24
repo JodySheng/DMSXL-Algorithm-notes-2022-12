@@ -1,0 +1,94 @@
+232.用栈实现队列 
+
+大家可以先看视频，了解一下模拟的过程，然后写代码会轻松很多。
+
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0232.%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97.html 
+
+使用栈实现队列的下列操作：
+
+push(x) -- 将一个元素放入队列的尾部。
+pop() -- 从队列首部移除元素。
+peek() -- 返回队列首部的元素。
+empty() -- 返回队列是否为空。
+
+在push数据的时候，只要数据放进输入栈就好，但在pop的时候，操作就复杂一些，输出栈如果为空，就把进栈数据全部导入进来（注意是全部导入），再从出栈弹出数据，如果输出栈不为空，则直接从出栈弹出数据就可以了。
+
+最后如何判断队列为空呢？如果进栈和出栈都为空的话，说明模拟的队列为空了。
+
+在代码实现的时候，会发现pop() 和 peek()两个函数功能类似，代码实现上也是类似的，可以思考一下如何把代码抽象一下。
+
+
+class MyQueue:
+
+    def __init__(self):
+        """
+        in主要负责push，out主要负责pop
+        """
+        self.stack_in = []
+        self.stack_out = []
+
+
+    def push(self, x: int) -> None:
+        """
+        有新元素进来，就往in里面push
+        """
+        self.stack_in.append(x)
+
+
+    def pop(self) -> int:
+        """
+        Removes the element from in front of queue and returns that element.
+        """
+        if self.empty():
+            return None
+        
+        if self.stack_out:
+            return self.stack_out.pop()
+        else:
+            for i in range(len(self.stack_in)):
+                self.stack_out.append(self.stack_in.pop())
+            return self.stack_out.pop()
+
+
+    def peek(self) -> int:
+        """
+        Get the front element.
+        """
+        ans = self.pop()
+        self.stack_out.append(ans)
+        return ans
+
+
+    def empty(self) -> bool:
+        """
+        只要in或者out有元素，说明队列不为空
+        """
+        return not (self.stack_in or self.stack_out)
+        
+225. 用队列实现栈 
+可以大家惯性思维，以为还要两个队列来模拟栈，其实只用一个队列就可以模拟栈了。 
+建议大家掌握一个队列的方法，更简单一些，可以先看视频讲解
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0225.%E7%94%A8%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0%E6%A0%88.html
+
+class MyStack:
+
+    def __init__(self):
+        self.que = deque()
+
+    def push(self, x: int) -> None:
+        self.que.append(x)
+
+    def pop(self) -> int:
+        if self.empty():
+            return None
+        for i in range(len(self.que)-1):
+            self.que.append(self.que.popleft())
+        return self.que.popleft()
+
+    def top(self) -> int:
+        if self.empty():
+            return None
+        return self.que[-1]
+
+    def empty(self) -> bool:
+        return not self.que
