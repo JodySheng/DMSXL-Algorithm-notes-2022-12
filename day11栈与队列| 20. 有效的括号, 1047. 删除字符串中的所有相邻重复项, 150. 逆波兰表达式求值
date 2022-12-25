@@ -1,0 +1,111 @@
+20. 有效的括号 
+讲完了栈实现队列，队列实现栈，接下来就是栈的经典应用了。 
+大家先自己思考一下 有哪些不匹配的场景，在看视频 我讲的都有哪些场景，落实到代码其实就容易很多了。
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0020.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7.html
+
+先来分析一下 这里有三种不匹配的情况，
+第一种情况，字符串里左方向的括号多余了 ，所以不匹配。
+第二种情况，括号没有多余，但是 括号的类型没有匹配上。
+第三种情况，字符串里右方向的括号多余了，所以不匹配。 
+我们的代码只要覆盖了这三种不匹配的情况，就不会出问题，可以看出 动手之前分析好题目的重要性。
+
+第一种情况：已经遍历完了字符串，但是栈不为空，说明有相应的左括号没有右括号来匹配，所以return false
+第二种情况：遍历字符串匹配的过程中，发现栈里没有要匹配的字符。所以return false
+第三种情况：遍历字符串匹配的过程中，栈已经为空了，没有匹配的字符了，说明右括号没有找到对应的左括号return false
+那么什么时候说明左括号和右括号全都匹配了呢，就是字符串遍历完之后，栈是空的，就说明全都匹配了。
+分析完之后，代码其实就比较好写了，
+但还有一些技巧，在匹配左括号的时候，右括号先入栈，就只需要比较当前元素和栈顶相不相等就可以了，比左括号先入栈代码实现要简单的多了！
+
+# 方法一，仅使用栈，更省空间
+class Solution:
+    def isValid(self, s: str) -> bool:
+        stack = []
+        
+        for item in s:
+            if item == '(':
+                stack.append(')')
+            elif item == '[':
+                stack.append(']')
+            elif item == '{':
+                stack.append('}')
+            elif not stack or stack[-1] != item:
+                return False
+            else:
+                stack.pop()
+        
+        return True if not stack else False
+
+# 方法二，使用字典
+class Solution:
+    def isValid(self, s: str) -> bool:
+        stack = []
+        mapping = {
+            '(': ')',
+            '[': ']',
+            '{': '}'
+        }
+        for item in s:
+            if item in mapping.keys():
+                stack.append(mapping[item])
+            elif not stack or stack[-1] != item: 
+                return False
+            else: 
+                stack.pop()
+        return True if not stack else False
+
+1047. 删除字符串中的所有相邻重复项 
+栈的经典应用。 
+要知道栈为什么适合做这种类似于爱消除的操作，因为栈帮助我们记录了 遍历数组当前元素时候，前一个元素是什么。
+题目链接/文章讲解/视频讲解：https://programmercarl.com/1047.%E5%88%A0%E9%99%A4%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E7%9A%84%E6%89%80%E6%9C%89%E7%9B%B8%E9%82%BB%E9%87%8D%E5%A4%8D%E9%A1%B9.html
+
+# 方法一，使用栈
+class Solution:
+    def removeDuplicates(self, s: str) -> str:
+        res = list()
+        for item in s:
+            if res and res[-1] == item:
+                res.pop()
+            else:
+                res.append(item)
+        return "".join(res)  # 字符串拼接
+        
+# 方法二，使用双指针模拟栈，如果不让用栈可以作为备选方法。
+class Solution:
+    def removeDuplicates(self, s: str) -> str:
+        res = list(s)
+        slow = fast = 0
+        length = len(res)
+
+        while fast < length:
+            # 如果一样直接换，不一样会把后面的填在slow的位置
+            res[slow] = res[fast]
+            
+            # 如果发现和前一个一样，就退一格指针
+            if slow > 0 and res[slow] == res[slow - 1]:
+                slow -= 1
+            else:
+                slow += 1
+            fast += 1
+            
+        return ''.join(res[0: slow])
+
+150. 逆波兰表达式求值 
+本题不难，但第一次做的话，会很难想到，所以先看视频，了解思路再去做题 
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0150.%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC.html 
+注：题目是合法的表达式
+
+class Solution:
+    def evalRPN(self, tokens: List[str]) -> int:
+        stack = []
+        for item in tokens:
+            if item not in {"+", "-", "*", "/"}:
+                stack.append(item)
+            else:
+                first_num, second_num = stack.pop(), stack.pop()
+                stack.append(
+                    int(eval(f'{second_num} {item} {first_num}'))   # 第一个出来的在运算符后面
+                )
+        return int(stack.pop()) # 如果一开始只有一个数，那么会是字符串形式的
+
+
+
