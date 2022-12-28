@@ -1,0 +1,137 @@
+详细布置 
+
+ 104.二叉树的最大深度 （优先掌握递归）
+什么是深度，什么是高度，如何求深度，如何求高度，这里有关系到二叉树的遍历方式。
+大家 要先看视频讲解，就知道以上我说的内容了，很多录友刷过这道题，但理解的还不够。
+题目链接/文章讲解/视频讲解： https://programmercarl.com/0104.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%A4%A7%E6%B7%B1%E5%BA%A6.html  
+
+class solution {
+public:
+    int getdepth(treenode* node) {
+        if (node == NULL) return 0;
+        int leftdepth = getdepth(node->left);       // 左
+        int rightdepth = getdepth(node->right);     // 右
+        int depth = 1 + max(leftdepth, rightdepth); // 中
+        return depth;
+    }
+    int maxdepth(treenode* root) {
+        return getdepth(root);
+    }
+};
+class solution {
+public:
+    int result;
+    void getdepth(treenode* node, int depth) {
+        result = depth > result ? depth : result; // 中
+
+        if (node->left == NULL && node->right == NULL) return ;
+
+        if (node->left) { // 左
+            depth++;    // 深度+1
+            getdepth(node->left, depth);
+            depth--;    // 回溯，深度-1
+        }
+        if (node->right) { // 右
+            depth++;    // 深度+1
+            getdepth(node->right, depth);
+            depth--;    // 回溯，深度-1
+        }
+        return ;
+    }
+    int maxdepth(treenode* root) {
+        result = 0;
+        if (root == NULL) return result;
+        getdepth(root, 1);
+        return result;
+    }
+};
+深度：节点到根结点的距离（前序遍历）
+高度：节点到叶子的距离（后序遍历）
+
+如果对层序遍历还不清楚的话，可以看这篇：二叉树：层序遍历登场！(opens new window)
+
+c++代码如下：
+
+class solution {
+public:
+    int maxdepth(treenode* root) {
+        if (root == NULL) return 0;
+        int depth = 0;
+        queue<treenode*> que;
+        que.push(root);
+        while(!que.empty()) {
+            int size = que.size();
+            depth++; // 记录深度
+            for (int i = 0; i < size; i++) {
+                treenode* node = que.front();
+                que.pop();
+                if (node->left) que.push(node->left);
+                if (node->right) que.push(node->right);
+            }
+        }
+        return depth;
+    }
+};
+
+559.n叉树的最大深度
+递归法：
+
+class solution:
+    def maxdepth(self, root: 'node') -> int:
+        if not root:
+            return 0
+        depth = 0
+        for i in range(len(root.children)):
+            depth = max(depth, self.maxdepth(root.children[i]))
+        return depth + 1
+迭代法：
+
+import collections
+class solution:
+    def maxdepth(self, root: 'node') -> int:
+        queue = collections.deque()
+        if root:
+            queue.append(root)
+        depth = 0 #记录深度
+        while queue:
+            size = len(queue)
+            depth += 1
+            for i in range(size):
+                node = queue.popleft()
+                for j in range(len(node.children)):
+                    if node.children[j]:
+                        queue.append(node.children[j])
+        return depth
+使用栈来模拟后序遍历依然可以
+
+class solution:
+    def maxdepth(self, root: 'node') -> int:
+        st = []
+        if root:
+            st.append(root)
+        depth = 0
+        result = 0
+        while st:
+            node = st.pop()
+            if node != none:
+                st.append(node) #中
+                st.append(none)
+                depth += 1
+                for i in range(len(node.children)): #处理孩子
+                    if node.children[i]:
+                        st.append(node.children[i])
+                    
+            else:
+                node = st.pop()
+                depth -= 1
+            result = max(result, depth)
+        return result
+
+ 111.二叉树的最小深度 （优先掌握递归）
+先看视频讲解，和最大深度 看似差不多，其实 差距还挺大，有坑。
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0111.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E6%B7%B1%E5%BA%A6.html 
+
+
+ 222.完全二叉树的节点个数（优先掌握递归）
+需要了解，普通二叉树 怎么求，完全二叉树又怎么求
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0222.%E5%AE%8C%E5%85%A8%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%8A%82%E7%82%B9%E4%B8%AA%E6%95%B0.html
