@@ -131,7 +131,171 @@ class solution:
 先看视频讲解，和最大深度 看似差不多，其实 差距还挺大，有坑。
 题目链接/文章讲解/视频讲解：https://programmercarl.com/0111.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E6%B7%B1%E5%BA%A6.html 
 
+class Solution {
+public:
+    int getDepth(TreeNode* node) {
+        if (node == NULL) return 0;
+        int leftDepth = getDepth(node->left);           // 左
+        int rightDepth = getDepth(node->right);         // 右
+                                                        // 中
+        // 当一个左子树为空，右不为空，这时并不是最低点
+        if (node->left == NULL && node->right != NULL) { 
+            return 1 + rightDepth;
+        }   
+        // 当一个右子树为空，左不为空，这时并不是最低点
+        if (node->left != NULL && node->right == NULL) { 
+            return 1 + leftDepth;
+        }
+        int result = 1 + min(leftDepth, rightDepth);
+        return result;
+    }
+
+    int minDepth(TreeNode* root) {
+        return getDepth(root);
+    }
+};
+精简之后代码如下：
+
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if (root == NULL) return 0;
+        if (root->left == NULL && root->right != NULL) {
+            return 1 + minDepth(root->right);
+        }
+        if (root->left != NULL && root->right == NULL) {
+            return 1 + minDepth(root->left);
+        }
+        return 1 + min(minDepth(root->left), minDepth(root->right));
+    }
+};
+精简之后的代码根本看不出是哪种遍历方式，所以依然还要强调一波：如果对二叉树的操作还不熟练，尽量不要直接照着精简代码来学。
+
+前序遍历的方式：
+
+class Solution {
+private:
+    int result;
+    void getdepth(TreeNode* node, int depth) {
+        if (node->left == NULL && node->right == NULL) {
+            result = min(depth, result);  
+            return;
+        }
+        // 中 只不过中没有处理的逻辑
+        if (node->left) { // 左
+            getdepth(node->left, depth + 1);
+        }
+        if (node->right) { // 右
+            getdepth(node->right, depth + 1);
+        }
+        return ;
+    }
+
+public:
+    int minDepth(TreeNode* root) {
+        if (root == NULL) return 0;
+        result = INT_MAX;
+        getdepth(root, 1);
+        return result;
+    }
+};
+
+迭代法
+相对于104.二叉树的最大深度 (opens new window)，本题还可以使用层序遍历的方式来解决，思路是一样的。
+
+如果对层序遍历还不清楚的话，可以看这篇：二叉树：层序遍历登场！(opens new window)
+
+需要注意的是，只有当左右孩子都为空的时候，才说明遍历到最低点了。如果其中一个孩子不为空则不是最低点
+
+代码如下：（详细注释）
+
+class Solution {
+public:
+
+    int minDepth(TreeNode* root) {
+        if (root == NULL) return 0;
+        int depth = 0;
+        queue<TreeNode*> que;
+        que.push(root);
+        while(!que.empty()) {
+            int size = que.size();
+            depth++; // 记录最小深度
+            for (int i = 0; i < size; i++) {
+                TreeNode* node = que.front();
+                que.pop();
+                if (node->left) que.push(node->left);
+                if (node->right) que.push(node->right);
+                if (!node->left && !node->right) { // 当左右孩子都为空的时候，说明是最低点的一层了，退出
+                    return depth;
+                }
+            }
+        }
+        return depth;
+    }
+};
+
 
  222.完全二叉树的节点个数（优先掌握递归）
 需要了解，普通二叉树 怎么求，完全二叉树又怎么求
 题目链接/文章讲解/视频讲解：https://programmercarl.com/0222.%E5%AE%8C%E5%85%A8%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%8A%82%E7%82%B9%E4%B8%AA%E6%95%B0.html
+首先按照普通二叉树的逻辑来求。
+
+Python
+递归法：
+
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        return self.getNodesNum(root)
+        
+    def getNodesNum(self, cur):
+        if not cur:
+            return 0
+        leftNum = self.getNodesNum(cur.left) #左
+        rightNum = self.getNodesNum(cur.right) #右
+        treeNum = leftNum + rightNum + 1 #中
+        return treeNum
+递归法：精简版
+
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        return 1 + self.countNodes(root.left) + self.countNodes(root.right)
+迭代法：
+
+import collections
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        queue = collections.deque()
+        if root:
+            queue.append(root)
+        result = 0
+        while queue:
+            size = len(queue)
+            for i in range(size):
+                node = queue.popleft()
+                result += 1 #记录节点数量
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+        return result
+完全二叉树
+
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        left = root.left
+        right = root.right
+        leftDepth = 0 #这里初始为0是有目的的，为了下面求指数方便
+        rightDepth = 0
+        while left: #求左子树深度
+            left = left.left
+            leftDepth += 1
+        while right: #求右子树深度
+            right = right.right
+            rightDepth += 1
+        if leftDepth == rightDepth:
+            return (2 << leftDepth) - 1 #注意(2<<1) 相当于2^2，所以leftDepth初始为0
+        return self.countNodes(root.left) + self.countNodes(root.right) + 1
