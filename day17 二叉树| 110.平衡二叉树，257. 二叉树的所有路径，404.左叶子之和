@@ -2,11 +2,249 @@
 再一次涉及到，什么是高度，什么是深度，可以巩固一下。
 题目链接/文章讲解/视频讲解：https://programmercarl.com/0110.%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91.html  
 
+递归
+此时大家应该明白了既然要求比较高度，必然是要后序遍历。
+
+递归三步曲分析：
+
+明确递归函数的参数和返回值
+参数：当前传入节点。
+返回值：以当前传入节点为根节点的树的高度。
+
+那么如何标记左右子树是否差值大于1呢？
+
+如果当前传入节点为根节点的二叉树已经不是二叉平衡树了，还返回高度的话就没有意义了。
+
+所以如果已经不是二叉平衡树了，可以返回-1 来标记已经不符合平衡树的规则了。
+
+代码如下：
+
+// -1 表示已经不是平衡二叉树了，否则返回值是以该节点为根节点树的高度
+int getHeight(TreeNode* node)
+明确终止条件
+递归的过程中依然是遇到空节点了为终止，返回0，表示当前节点为根节点的树高度为0
+
+代码如下：
+
+if (node == NULL) {
+    return 0;
+}
+
+明确单层递归的逻辑
+如何判断以当前传入节点为根节点的二叉树是否是平衡二叉树呢？当然是其左子树高度和其右子树高度的差值。
+
+分别求出其左右子树的高度，然后如果差值小于等于1，则返回当前二叉树的高度，否则返回-1，表示已经不是二叉平衡树了。
+
+代码如下：
+
+int leftHeight = getHeight(node->left); // 左
+if (leftHeight == -1) return -1;
+int rightHeight = getHeight(node->right); // 右
+if (rightHeight == -1) return -1;
+
+int result;
+if (abs(leftHeight - rightHeight) > 1) {  // 中
+    result = -1;
+} else {
+    result = 1 + max(leftHeight, rightHeight); // 以当前节点为根节点的树的最大高度
+}
+
+return result;
+代码精简之后如下：
+
+int leftHeight = getHeight(node->left);
+if (leftHeight == -1) return -1;
+int rightHeight = getHeight(node->right);
+if (rightHeight == -1) return -1;
+return abs(leftHeight - rightHeight) > 1 ? -1 : 1 + max(leftHeight, rightHeight);
+此时递归的函数就已经写出来了，这个递归的函数传入节点指针，返回以该节点为根节点的二叉树的高度，如果不是二叉平衡树，则返回-1。
+
+getHeight整体代码如下：
+
+int getHeight(TreeNode* node) {
+    if (node == NULL) {
+        return 0;
+    }
+    int leftHeight = getHeight(node->left);
+    if (leftHeight == -1) return -1;
+    int rightHeight = getHeight(node->right);
+    if (rightHeight == -1) return -1;
+    return abs(leftHeight - rightHeight) > 1 ? -1 : 1 + max(leftHeight, rightHeight);
+}
+最后本题整体递归代码如下：
+
+class Solution {
+public:
+    // 返回以该节点为根节点的二叉树的高度，如果不是平衡二叉树了则返回-1
+    int getHeight(TreeNode* node) {
+        if (node == NULL) {
+            return 0;
+        }
+        int leftHeight = getHeight(node->left);
+        if (leftHeight == -1) return -1;
+        int rightHeight = getHeight(node->right);
+        if (rightHeight == -1) return -1;
+        return abs(leftHeight - rightHeight) > 1 ? -1 : 1 + max(leftHeight, rightHeight);
+    }
+    bool isBalanced(TreeNode* root) {
+        return getHeight(root) == -1 ? false : true;
+
+Python
+递归法：
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isBalanced(self, root: TreeNode) -> bool:
+        if self.get_height(root) != -1:
+            return True
+        else:
+            return False
+    
+    def get_height(self, root: TreeNode) -> int:
+        # Base Case
+        if not root:
+            return 0
+        # 左
+        if (left_height := self.get_height(root.left)) == -1:
+            return -1
+        # 右
+        if (right_height := self.get_height(root.right)) == -1:
+            return -1
+        # 中
+        if abs(left_height - right_height) > 1:
+            return -1
+        else:
+            return 1 + max(left_height, right_height)
+迭代法：
+
+class Solution:
+    def isBalanced(self, root: Optional[TreeNode]) -> bool:
+        if not root:
+            return True
+
+        height_map = {}
+        stack = [root]
+        while stack:
+            node = stack.pop()
+            if node:
+                stack.append(node)
+                stack.append(None)
+                if node.left: stack.append(node.left)
+                if node.right: stack.append(node.right)
+            else:
+                real_node = stack.pop()
+                left, right = height_map.get(real_node.left, 0), height_map.get(real_node.right, 0)
+                if abs(left - right) > 1:
+                    return False
+                height_map[real_node] = 1 + max(left, right)
+        return True
  257. 二叉树的所有路径 （优先掌握递归）  
 这是大家第一次接触到回溯的过程， 我在视频里重点讲解了 本题为什么要有回溯，已经回溯的过程。 
 如果对回溯 似懂非懂，没关系， 可以先有个印象。 
 题目链接/文章讲解/视频讲解：https://programmercarl.com/0257.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%89%80%E6%9C%89%E8%B7%AF%E5%BE%84.html 
 
+Python:
+递归法+隐形回溯
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+        path = ''
+        result = []
+        if not root: return result
+        self.traversal(root, path, result)
+        return result
+    
+    def traversal(self, cur: TreeNode, path: str, result: List[str]) -> None:
+        path += str(cur.val)
+        # 若当前节点为leave，直接输出
+        if not cur.left and not cur.right:
+            result.append(path)
+
+        if cur.left:
+            # + '->' 是隐藏回溯
+            self.traversal(cur.left, path + '->', result)
+        
+        if cur.right:
+            self.traversal(cur.right, path + '->', result)
+迭代法：
+
+from collections import deque
+
+
+class Solution:
+    """二叉树的所有路径 迭代法"""
+
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+        # 题目中节点数至少为1
+        stack, path_st, result = deque([root]), deque(), []
+        path_st.append(str(root.val))
+
+        while stack:
+            cur = stack.pop()
+            path = path_st.pop()
+            # 如果当前节点为叶子节点，添加路径到结果中
+            if not (cur.left or cur.right):
+                result.append(path)
+            if cur.right:
+                stack.append(cur.right)
+                path_st.append(path + '->' + str(cur.right.val))
+            if cur.left:
+                stack.append(cur.left)
+                path_st.append(path + '->' + str(cur.left.val))
+
+        return result
  404.左叶子之和 （优先掌握递归）
 其实本题有点文字游戏，搞清楚什么是左叶子，剩下的就是二叉树的基本操作。 
 题目链接/文章讲解/视频讲解：https://programmercarl.com/0404.%E5%B7%A6%E5%8F%B6%E5%AD%90%E4%B9%8B%E5%92%8C.html
+
+递归后序遍历
+
+class Solution:
+    def sumOfLeftLeaves(self, root: TreeNode) -> int:
+        if not root: 
+            return 0
+        
+        left_left_leaves_sum = self.sumOfLeftLeaves(root.left)  # 左
+        right_left_leaves_sum = self.sumOfLeftLeaves(root.right) # 右
+        
+        cur_left_leaf_val = 0
+        if root.left and not root.left.left and not root.left.right: 
+            cur_left_leaf_val = root.left.val 
+            
+        return cur_left_leaf_val + left_left_leaves_sum + right_left_leaves_sum # 中
+迭代
+
+class Solution:
+    def sumOfLeftLeaves(self, root: TreeNode) -> int:
+        """
+        Idea: Each time check current node's left node. 
+              If current node don't have one, skip it. 
+        """
+        stack = []
+        if root: 
+            stack.append(root)
+        res = 0
+        
+        while stack: 
+            # 每次都把当前节点的左节点加进去. 
+            cur_node = stack.pop()
+            if cur_node.left and not cur_node.left.left and not cur_node.left.right: 
+                res += cur_node.left.val
+                
+            if cur_node.left: 
+                stack.append(cur_node.left)
+            if cur_node.right: 
+                stack.append(cur_node.right)
+                
+        return res
