@@ -1,0 +1,216 @@
+详细布置 
+ 513.找树左下角的值  
+本地递归偏难，反而迭代简单属于模板题， 两种方法掌握一下 
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0513.%E6%89%BE%E6%A0%91%E5%B7%A6%E4%B8%8B%E8%A7%92%E7%9A%84%E5%80%BC.html  
+
+Python
+递归:
+
+class Solution:
+    def findBottomLeftValue(self, root: TreeNode) -> int:
+        max_depth = -float("INF")
+        leftmost_val = 0
+
+        def __traverse(root, cur_depth): 
+            nonlocal max_depth, leftmost_val
+            if not root.left and not root.right: 
+                if cur_depth > max_depth: 
+                    max_depth = cur_depth
+                    leftmost_val = root.val  
+            if root.left: 
+                cur_depth += 1
+                __traverse(root.left, cur_depth)
+                cur_depth -= 1
+            if root.right: 
+                cur_depth += 1
+                __traverse(root.right, cur_depth)
+                cur_depth -= 1
+
+        __traverse(root, 0)
+        return leftmost_val
+迭代 - 层序遍历:
+
+class Solution:
+    def findBottomLeftValue(self, root: TreeNode) -> int:
+        queue = deque()
+        if root: 
+            queue.append(root)
+        result = 0
+        while queue: 
+            q_len = len(queue)
+            for i in range(q_len): 
+                if i == 0: 
+                    result = queue[i].val 
+                cur = queue.popleft()
+                if cur.left: 
+                    queue.append(cur.left)
+                if cur.right: 
+                    queue.append(cur.right)
+        return result
+
+ 112.路径总和  
+本题 又一次设计要回溯的过程，而且回溯的过程隐藏的还挺深，建议先看视频来理解 
+112. 路径总和，和 113. 路径总和ii 一起做了。 优先掌握递归法。
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0112.%E8%B7%AF%E5%BE%84%E6%80%BB%E5%92%8C.html  
+
+112.路径总和
+递归
+
+class solution:
+    def haspathsum(self, root: treenode, targetsum: int) -> bool:
+        def isornot(root, targetsum) -> bool:
+            if (not root.left) and (not root.right) and targetsum == 0:
+                return true  # 遇到叶子节点，并且计数为0
+            if (not root.left) and (not root.right):
+                return false  # 遇到叶子节点，计数不为0
+            if root.left:
+                targetsum -= root.left.val  # 左节点
+                if isornot(root.left, targetsum): return true  # 递归，处理左节点
+                targetsum += root.left.val  # 回溯
+            if root.right:
+                targetsum -= root.right.val  # 右节点
+                if isornot(root.right, targetsum): return true  # 递归，处理右节点
+                targetsum += root.right.val  # 回溯
+            return false
+
+        if root == none:
+            return false  # 别忘记处理空treenode
+        else:
+            return isornot(root, targetsum - root.val)
+迭代 - 层序遍历
+
+class solution:
+    def haspathsum(self, root: treenode, targetsum: int) -> bool:
+        if not root: 
+            return false
+
+        stack = []  # [(当前节点，路径数值), ...]
+        stack.append((root, root.val))
+
+        while stack: 
+            cur_node, path_sum = stack.pop()
+
+            if not cur_node.left and not cur_node.right and path_sum == targetsum: 
+                return true
+
+            if cur_node.right: 
+                stack.append((cur_node.right, path_sum + cur_node.right.val))    
+
+            if cur_node.left: 
+                stack.append((cur_node.left, path_sum + cur_node.left.val))
+
+        return false
+#0113.路径总和-ii
+递归
+
+class solution:
+    def pathsum(self, root: treenode, targetsum: int) -> list[list[int]]:
+
+        def traversal(cur_node, remain): 
+            if not cur_node.left and not cur_node.right:
+                if remain == 0: 
+                    result.append(path[:])
+                return
+
+            if cur_node.left: 
+                path.append(cur_node.left.val)
+                traversal(cur_node.left, remain-cur_node.left.val)
+                path.pop()
+
+            if cur_node.right: 
+                path.append(cur_node.right.val)
+                traversal(cur_node.right, remain-cur_node.right.val)
+                path.pop()
+
+        result, path = [], []
+        if not root: 
+            return []
+        path.append(root.val)
+        traversal(root, targetsum - root.val)
+        return result
+迭代法，用第二个队列保存目前的总和与路径
+
+class Solution:
+    def pathSum(self, root: Optional[TreeNode], targetSum: int) -> List[List[int]]:
+        if not root:
+            return []
+        que, temp = deque([root]), deque([(root.val, [root.val])])
+        result = []
+        while que:
+            for _ in range(len(que)):
+                node = que.popleft()
+                value, path = temp.popleft()
+                if (not node.left) and (not node.right):
+                    if value == targetSum:
+                        result.append(path)
+                if node.left:
+                    que.append(node.left)
+                    temp.append((node.left.val+value, path+[node.left.val]))
+                if node.right:
+                    que.append(node.right)
+                    temp.append((node.right.val+value, path+[node.right.val]))
+        return result
+
+ 106.从中序与后序遍历序列构造二叉树 
+本题算是比较难的二叉树题目了，大家先看视频来理解。 
+106.从中序与后序遍历序列构造二叉树，105.从前序与中序遍历序列构造二叉树 一起做，思路一样的
+题目链接/文章讲解/视频讲解：https://programmercarl.com/0106.%E4%BB%8E%E4%B8%AD%E5%BA%8F%E4%B8%8E%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86%E5%BA%8F%E5%88%97%E6%9E%84%E9%80%A0%E4%BA%8C%E5%8F%89%E6%A0%91.html
+Python
+105.从前序与中序遍历序列构造二叉树
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+        # 第一步: 特殊情况讨论: 树为空. 或者说是递归终止条件
+        if not preorder: 
+            return None
+
+        # 第二步: 前序遍历的第一个就是当前的中间节点. 
+        root_val = preorder[0]
+        root = TreeNode(root_val)
+
+        # 第三步: 找切割点. 
+        separator_idx = inorder.index(root_val)
+
+        # 第四步: 切割inorder数组. 得到inorder数组的左,右半边. 
+        inorder_left = inorder[:separator_idx]
+        inorder_right = inorder[separator_idx + 1:]
+
+        # 第五步: 切割preorder数组. 得到preorder数组的左,右半边.
+        # ⭐️ 重点1: 中序数组大小一定跟前序数组大小是相同的. 
+        preorder_left = preorder[1:1 + len(inorder_left)]
+        preorder_right = preorder[1 + len(inorder_left):]
+
+        # 第六步: 递归
+        root.left = self.buildTree(preorder_left, inorder_left)
+        root.right = self.buildTree(preorder_right, inorder_right)
+
+        return root
+106.从中序与后序遍历序列构造二叉树
+
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        # 第一步: 特殊情况讨论: 树为空. (递归终止条件)
+        if not postorder: 
+            return None
+
+        # 第二步: 后序遍历的最后一个就是当前的中间节点. 
+        root_val = postorder[-1]
+        root = TreeNode(root_val)
+
+        # 第三步: 找切割点. 
+        separator_idx = inorder.index(root_val)
+
+        # 第四步: 切割inorder数组. 得到inorder数组的左,右半边. 
+        inorder_left = inorder[:separator_idx]
+        inorder_right = inorder[separator_idx + 1:]
+
+        # 第五步: 切割postorder数组. 得到postorder数组的左,右半边.
+        # ⭐️ 重点1: 中序数组大小一定跟后序数组大小是相同的. 
+        postorder_left = postorder[:len(inorder_left)]
+        postorder_right = postorder[len(inorder_left): len(postorder) - 1]
+
+        # 第六步: 递归
+        root.left = self.buildTree(inorder_left, postorder_left)
+        root.right = self.buildTree(inorder_right, postorder_right)
+
+        return root
