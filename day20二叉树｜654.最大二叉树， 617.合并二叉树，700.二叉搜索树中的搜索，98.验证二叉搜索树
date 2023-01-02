@@ -5,10 +5,118 @@
 题目链接/文章讲解：https://programmercarl.com/0654.%E6%9C%80%E5%A4%A7%E4%BA%8C%E5%8F%89%E6%A0%91.html  
 视频讲解：https://www.bilibili.com/video/BV1MG411G7ox  
 
+构造树一般采用的是前序遍历，因为先构造中间节点，然后递归构造左子树和右子树。
+注意类似用数组构造二叉树的题目，每次分隔尽量不要定义新的数组，而是通过下标索引直接在原数组上操作，这样可以节约时间和空间上的开销。
+一些同学也会疑惑，什么时候递归函数前面加if，什么时候不加if，这个问题我在最后也给出了解释。
+其实就是不同代码风格的实现，一般情况来说：如果让空节点（空指针）进入递归，就不加if，如果不让空节点进入递归，就加if限制一下， 终止条件也会相应的调整。
+
+class Solution:
+    """递归法 更快"""
+    def constructMaximumBinaryTree(self, nums: List[int]) -> TreeNode:
+        if not nums:
+            return None
+        maxvalue = max(nums)
+        index = nums.index(maxvalue)
+        
+        root = TreeNode(maxvalue)
+
+        left = nums[:index]
+        right = nums[index + 1:]
+
+        root.left = self.constructMaximumBinaryTree(left)
+        root.right = self.constructMaximumBinaryTree(right)
+        return root
+        
+class Solution:
+    """最大二叉树 递归法"""
+
+    def constructMaximumBinaryTree(self, nums: List[int]) -> TreeNode:
+        return self.traversal(nums, 0, len(nums))
+    
+    def traversal(self, nums: List[int], begin: int, end: int) -> TreeNode:
+        # 列表长度为0时返回空节点
+        if begin == end:
+            return None
+        
+        # 找到最大的值和其对应的下标
+        max_index = begin
+        for i in range(begin, end):
+            if nums[i] > nums[max_index]:
+                max_index = i
+        
+        # 构建当前节点
+        root = TreeNode(nums[max_index])
+        
+        # 递归构建左右子树
+        root.left = self.traversal(nums, begin, max_index)
+        root.right = self.traversal(nums, max_index + 1, end)
+        
+        return root
+
+
  617.合并二叉树 
 这次是一起操作两个二叉树了， 估计大家也没一起操作过两个二叉树，也不知道该如何一起操作，可以看视频先理解一下。 优先掌握递归。
 题目链接/文章讲解：https://programmercarl.com/0617.%E5%90%88%E5%B9%B6%E4%BA%8C%E5%8F%89%E6%A0%91.html  
 视频讲解：https://www.bilibili.com/video/BV1m14y1Y7JK  
+
+Python
+递归法 - 前序遍历
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def mergeTrees(self, root1: TreeNode, root2: TreeNode) -> TreeNode:
+        # 递归终止条件: 
+        #  但凡有一个节点为空, 就立刻返回另外一个. 如果另外一个也为None就直接返回None. 
+        if not root1: 
+            return root2
+        if not root2: 
+            return root1
+        # 上面的递归终止条件保证了代码执行到这里root1, root2都非空. 
+        root1.val += root2.val # 中
+        root1.left = self.mergeTrees(root1.left, root2.left) #左
+        root1.right = self.mergeTrees(root1.right, root2.right) # 右
+        
+        return root1 # ⚠️ 注意: 本题我们重复使用了题目给出的节点而不是创建新节点. 节省时间, 空间. 
+
+迭代法
+
+class Solution:
+    def mergeTrees(self, root1: TreeNode, root2: TreeNode) -> TreeNode:
+        if not root1: 
+            return root2
+        if not root2: 
+            return root1
+
+        queue = deque()
+        queue.append(root1)
+        queue.append(root2)
+
+        while queue: 
+            node1 = queue.popleft()
+            node2 = queue.popleft()
+            # 更新queue
+            # 只有两个节点都有左节点时, 再往queue里面放.
+            if node1.left and node2.left: 
+                queue.append(node1.left)
+                queue.append(node2.left)
+            # 只有两个节点都有右节点时, 再往queue里面放.
+            if node1.right and node2.right: 
+                queue.append(node1.right)
+                queue.append(node2.right)
+
+            # 更新当前节点. 同时改变当前节点的左右孩子. 
+            node1.val += node2.val
+            if not node1.left and node2.left: 
+                node1.left = node2.left
+            if not node1.right and node2.right: 
+                node1.right = node2.right
+
+        return root1
 
  700.二叉搜索树中的搜索 
 递归和迭代 都可以掌握以下，因为本题比较简单， 了解一下 二叉搜索树的特性
