@@ -1,0 +1,172 @@
+530.二叉搜索树的最小绝对差 
+
+需要领悟一下二叉树遍历上双指针操作，优先掌握递归 
+题目链接/文章讲解：https://programmercarl.com/0530.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E7%BB%9D%E5%AF%B9%E5%B7%AE.html 
+视频讲解：https://www.bilibili.com/video/BV1DD4y11779 
+
+遇到在二叉搜索树上求什么最值，求差值之类的，都要思考一下二叉搜索树可是有序的，要利用好这一特点。
+同时要学会在递归遍历的过程中如何记录前后两个指针，这也是一个小技巧，学会了还是很受用的。
+后面我将继续介绍一系列利用二叉搜索树特性的题目。
+
+class Solution {
+    TreeNode pre;// 记录上一个遍历的结点
+    int result = Integer.MAX_VALUE;
+    public int getMinimumDifference(TreeNode root) {
+       if(root==null)return 0;
+       traversal(root);
+       return result;
+    }
+    public void traversal(TreeNode root){
+        if(root==null)return;
+        //左
+        traversal(root.left);
+        //中
+        if(pre!=null){
+            result = Math.min(result,root.val-pre.val);
+        }
+        pre = root;
+        //右
+        traversal(root.right);
+    }
+}
+
+递归
+
+class Solution:
+    def getMinimumDifference(self, root: TreeNode) -> int:
+        res = []   
+        r = float("inf")
+        def buildaList(root):  //把二叉搜索树转换成有序数组
+            if not root: return None
+            if root.left: buildaList(root.left)  //左
+            res.append(root.val)  //中
+            if root.right: buildaList(root.right)  //右
+            return res
+            
+        buildaList(root)
+        for i in range(len(res)-1):  // 统计有序数组的最小差值
+            r = min(abs(res[i]-res[i+1]),r)
+        return r
+迭代法-中序遍历
+
+class Solution:
+    def getMinimumDifference(self, root: TreeNode) -> int:
+        stack = []
+        cur = root
+        pre = None
+        result = float('inf')
+        while cur or stack:
+            if cur: # 指针来访问节点，访问到最底层
+                stack.append(cur)
+                cur = cur.left
+            else: # 逐一处理节点
+                cur = stack.pop()
+                if pre: # 当前节点和前节点的值的差值
+                    result = min(result, abs(cur.val - pre.val))
+                pre = cur
+                cur = cur.right
+        return result
+        
+ 501.二叉搜索树中的众数 
+
+和 530差不多双指针思路，不过 这里涉及到一个很巧妙的代码技巧。
+可以先自己做做看，然后看我的视频讲解。
+https://programmercarl.com/0501.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E4%BC%97%E6%95%B0.html  
+视频讲解：https://www.bilibili.com/video/BV1fD4y117gp  
+
+递归法
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def __init__(self):
+        self.pre = TreeNode()
+        self.count = 0
+        self.max_count = 0
+        self.result = []
+
+    def findMode(self, root: TreeNode) -> List[int]:
+        if not root: return None
+        self.search_BST(root)
+        return self.result
+        
+    def search_BST(self, cur: TreeNode) -> None:
+        if not cur: return None
+        self.search_BST(cur.left)
+        # 第一个节点
+        if not self.pre:
+            self.count = 1
+        # 与前一个节点数值相同
+        elif self.pre.val == cur.val:
+            self.count += 1 
+        # 与前一个节点数值不相同
+        else:
+            self.count = 1
+        self.pre = cur
+
+        if self.count == self.max_count:
+            self.result.append(cur.val)
+        
+        if self.count > self.max_count:
+            self.max_count = self.count
+            self.result = [cur.val]	# 清空self.result，确保result之前的的元素都失效
+        
+        self.search_BST(cur.right)
+ 
+ 迭代法-中序遍历-不使用额外空间，利用二叉搜索树特性
+
+class Solution:
+    def findMode(self, root: TreeNode) -> List[int]:
+        stack = []
+        cur = root
+        pre = None
+        maxCount, count = 0, 0
+        res = []
+        while cur or stack:
+            if cur:  # 指针来访问节点，访问到最底层
+                stack.append(cur)
+                cur = cur.left
+            else:  # 逐一处理节点
+                cur = stack.pop()
+                if pre == None:  # 第一个节点
+                    count = 1
+                elif pre.val == cur.val:  # 与前一个节点数值相同
+                    count += 1
+                else:
+                    count = 1
+                if count == maxCount:
+                    res.append(cur.val)
+                if count > maxCount:
+                    maxCount = count
+                    res.clear()
+                    res.append(cur.val)
+
+                pre = cur
+                cur = cur.right
+        return res
+        
+ 236. 二叉树的最近公共祖先 
+
+本题其实是比较难的，可以先看我的视频讲解 
+https://programmercarl.com/0236.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88.html 
+视频讲解：https://www.bilibili.com/video/BV1jd4y1B7E2
+
+class Solution:
+    """二叉树的最近公共祖先 递归法"""
+
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if not root or root == p or root == q:
+            return root
+        
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+        
+        if left and right:
+            return root
+        if left:
+            return left
+        return right
