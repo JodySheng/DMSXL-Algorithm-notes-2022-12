@@ -1,0 +1,220 @@
+ 235. 二叉搜索树的最近公共祖先 
+相对于 二叉树的最近公共祖先 本题就简单一些了，因为 可以利用二叉搜索树的特性。 
+题目链接/文章讲解：https://programmercarl.com/0235.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88.html  
+视频讲解：https://www.bilibili.com/video/BV1Zt4y1F7ww  
+
+递归法：
+
+class Solution:
+    """二叉搜索树的最近公共祖先 递归法"""
+
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if root.val > p.val and root.val > q.val:
+            return self.lowestCommonAncestor(root.left, p, q)
+        if root.val < p.val and root.val < q.val:
+            return self.lowestCommonAncestor(root.right, p, q)
+        return root
+迭代法：
+
+class Solution:
+    """二叉搜索树的最近公共祖先 迭代法"""
+
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        while True:
+            if root.val > p.val and root.val > q.val:
+                root = root.left
+            elif root.val < p.val and root.val < q.val:
+                root = root.right
+            else:
+                return root
+
+
+ 701.二叉搜索树中的插入操作  
+本题比想象中的简单，大家可以先自己想一想应该怎么做，然后看视频讲解，就发现 本题为什么比较简单了。
+题目链接/文章讲解：https://programmercarl.com/0701.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9C.html  
+视频讲解：https://www.bilibili.com/video/BV1Et4y1c78Y  
+
+递归法 - 有返回值
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def insertIntoBST(self, root: TreeNode, val: int) -> TreeNode:
+        # 返回更新后的以当前root为根节点的新树，方便用于更新上一层的父子节点关系链
+
+        # Base Case
+        if not root: return TreeNode(val)
+
+        # 单层递归逻辑:
+        if val < root.val: 
+            # 将val插入至当前root的左子树中合适的位置
+            # 并更新当前root的左子树为包含目标val的新左子树
+            root.left = self.insertIntoBST(root.left, val)
+
+        if root.val < val:
+            # 将val插入至当前root的右子树中合适的位置
+            # 并更新当前root的右子树为包含目标val的新右子树
+            root.right = self.insertIntoBST(root.right, val)
+
+        # 返回更新后的以当前root为根节点的新树
+        return root
+递归法 - 无返回值
+
+class Solution:
+    def insertIntoBST(self, root: TreeNode, val: int) -> TreeNode:
+        if not root: 
+            return TreeNode(val)
+        parent = None
+        def __traverse(cur: TreeNode, val: int) -> None: 
+            # 在函数运行的同时把新节点插入到该被插入的地方. 
+            nonlocal parent
+            if not cur: 
+                new_node = TreeNode(val)
+                if parent.val < val: 
+                    parent.right = new_node
+                else: 
+                    parent.left = new_node
+                return 
+
+            parent = cur # 重点: parent的作用只有运行到上面if not cur:才会发挥出来.
+            if cur.val < val: 
+                __traverse(cur.right, val)
+            else: 
+                __traverse(cur.left, val)
+            return
+        __traverse(root, val)
+        return root
+递归法 - 无返回值 - another easier way
+
+class Solution:
+    def insertIntoBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+        newNode = TreeNode(val)
+        if not root: return newNode
+        
+        if not root.left and val < root.val:
+            root.left = newNode
+        if not root.right and val > root.val:
+            root.right = newNode
+        
+        if val < root.val:
+            self.insertIntoBST(root.left, val)
+        if val > root.val:
+            self.insertIntoBST(root.right, val)
+        
+        return root
+递归法 - 无返回值 有注释 不用Helper function
+
+class Solution:
+    def insertIntoBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+        if not root:    # for root==None
+            return TreeNode(val)
+        if root.val<val:
+            if root.right==None:    # find the parent
+                root.right = TreeNode(val)
+            else:   # not found, keep searching
+                self.insertIntoBST(root.right, val)
+        if root.val>val:
+            if root.left==None: # found the parent
+                root.left = TreeNode(val)
+            else:   # not found, keep searching
+                self.insertIntoBST(root.left, val)
+        # return the final tree
+        return root
+迭代法
+与无返回值的递归函数的思路大体一致
+
+class Solution:
+    def insertIntoBST(self, root: TreeNode, val: int) -> TreeNode:
+        if not root: 
+            return TreeNode(val)
+        parent = None # 此步可以省略
+        cur = root
+
+        # 用while循环不断地找新节点的parent
+        while cur: 
+            parent = cur  # 首先保存当前非空节点作为下一次迭代的父节点
+            if cur.val < val: 
+                cur = cur.right
+            elif cur.val > val: 
+                cur = cur.left
+
+        # 运行到这意味着已经跳出上面的while循环, 
+        # 同时意味着新节点的parent已经被找到.
+        # parent已被找到, 新节点已经ready. 把两个节点黏在一起就好了. 
+        if parent.val > val: 
+            parent.left = TreeNode(val)
+        else: 
+            parent.right = TreeNode(val)
+        
+        return root
+
+ 450.删除二叉搜索树中的节点  
+相对于 插入操作，本题就有难度了，涉及到改树的结构 
+题目链接/文章讲解：https://programmercarl.com/0450.%E5%88%A0%E9%99%A4%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9.html  
+视频讲解：https://www.bilibili.com/video/BV1tP41177us
+
+class Solution:
+    def deleteNode(self, root: Optional[TreeNode], key: int) -> Optional[TreeNode]:
+        if not root : return  None # 节点为空，返回
+        if root.val < key :
+            root.right = self.deleteNode(root.right, key)
+        elif root.val > key :
+            root.left = self.deleteNode(root.left, key)
+        else:
+            # 当前节点的左子树为空，返回当前的右子树
+            if not root.left : return root.right
+            # 当前节点的右子树为空，返回当前的左子树
+            if not root.right: return root.left
+            # 左右子树都不为空，找到右孩子的最左节点 记为p
+            node = root.right
+            while node.left :
+                node = node.left
+            # 将当前节点的左子树挂在p的左孩子上
+            node.left = root.left
+            # 当前节点的右子树替换掉当前节点，完成当前节点的删除
+            root = root.right
+        return root
+迭代法
+
+class Solution:
+    def deleteNode(self, root: Optional[TreeNode], key: int) -> Optional[TreeNode]:
+        # 找到节点后分两步，1. 把节点的左子树和右子树连起来，2. 把右子树跟父节点连起来
+        # root is None
+        if not root: return root
+        p = root
+        last = None
+        while p:
+            if p.val==key:
+                # 1. connect left to right
+                # right is not None -> left is None | left is not None
+                if p.right:
+                    if p.left:
+                        node = p.right
+                        while node.left:
+                            node = node.left
+                        node.left = p.left
+                    right = p.right
+                else:
+                # right is None -> right=left
+                    right = p.left
+                # 2. connect right to last
+                if last==None:
+                    root = right
+                elif last.val>key:
+                    last.left = right
+                else:
+                    last.right = right
+                # 3. return
+                break
+            else:
+                # Update last and continue
+                last = p
+                if p.val>key:
+                    p = p.left
+                else:
+                    p = p.right
+        return root
