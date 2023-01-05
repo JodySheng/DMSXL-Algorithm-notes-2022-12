@@ -1,0 +1,192 @@
+669. 修剪二叉搜索树 
+这道题目比较难，比 添加增加和删除节点难的多，建议先看视频理解。
+题目链接/文章讲解： https://programmercarl.com/0669.%E4%BF%AE%E5%89%AA%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.html  
+视频讲解： https://www.bilibili.com/video/BV17P41177ud  
+
+递归
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def trimBST(self, root: TreeNode, low: int, high: int) -> TreeNode:
+        '''
+        确认递归函数参数以及返回值：返回更新后剪枝后的当前root节点
+        '''
+        # Base Case
+        if not root: return None
+
+        # 单层递归逻辑
+        if root.val < low:
+            # 若当前root节点小于左界：只考虑其右子树，用于替代更新后的其本身，抛弃其左子树整体
+            return self.trimBST(root.right, low, high)
+        
+        if high < root.val:
+            # 若当前root节点大于右界：只考虑其左子树，用于替代更新后的其本身，抛弃其右子树整体
+            return self.trimBST(root.left, low, high)
+
+        if low <= root.val <= high:
+            root.left = self.trimBST(root.left, low, high)
+            root.right = self.trimBST(root.right, low, high)
+            # 返回更新后的剪枝过的当前节点root
+            return root
+            
+ 迭代法
+因为二叉搜索树的有序性，不需要使用栈模拟递归的过程。
+
+在剪枝的时候，可以分为三步：
+
+将root移动到[L, R] 范围内，注意是左闭右闭区间
+剪枝左子树
+剪枝右子树
+代码如下：
+
+class Solution {
+public:
+    TreeNode* trimBST(TreeNode* root, int L, int R) {
+        if (!root) return nullptr;
+
+        // 处理头结点，让root移动到[L, R] 范围内，注意是左闭右闭
+        while (root != nullptr && (root->val < L || root->val > R)) {
+            if (root->val < L) root = root->right; // 小于L往右走
+            else root = root->left; // 大于R往左走
+        }
+        TreeNode *cur = root;
+        // 此时root已经在[L, R] 范围内，处理左孩子元素小于L的情况
+        while (cur != nullptr) {
+            while (cur->left && cur->left->val < L) {
+                cur->left = cur->left->right;
+            }
+            cur = cur->left;
+        }
+        cur = root;
+
+        // 此时root已经在[L, R] 范围内，处理右孩子大于R的情况
+        while (cur != nullptr) {
+            while (cur->right && cur->right->val > R) {
+                cur->right = cur->right->left;
+            }
+            cur = cur->right;
+        }
+        return root;
+    }
+};
+
+ 108.将有序数组转换为二叉搜索树  
+本题就简单一些，可以尝试先自己做做。
+https://programmercarl.com/0108.%E5%B0%86%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E8%BD%AC%E6%8D%A2%E4%B8%BA%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.html  
+视频讲解：https://www.bilibili.com/video/BV1uR4y1X7qL  
+递归
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> TreeNode:
+        '''
+        构造二叉树：重点是选取数组最中间元素为分割点，左侧是递归左区间；右侧是递归右区间
+        必然是平衡树
+        左闭右闭区间
+        '''
+        # 返回根节点
+        root = self.traversal(nums, 0, len(nums)-1)
+        return root
+
+    def traversal(self, nums: List[int], left: int, right: int) -> TreeNode:
+        # Base Case
+        if left > right:
+            return None
+        
+        # 确定左右界的中心，防越界
+        mid = left + (right - left) // 2
+        # 构建根节点
+        mid_root = TreeNode(nums[mid])
+        # 构建以左右界的中心为分割点的左右子树
+        mid_root.left = self.traversal(nums, left, mid-1)
+        mid_root.right = self.traversal(nums, mid+1, right)
+
+        # 返回由被传入的左右界定义的某子树的根节点
+        return mid_root
+
+ 538.把二叉搜索树转换为累加树  
+本题也不难，在 求二叉搜索树的最小绝对差 和 众数 那两道题目 都讲过了 双指针法，思路是一样的。
+https://programmercarl.com/0538.%E6%8A%8A%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%B4%AF%E5%8A%A0%E6%A0%91.html  
+视频讲解：https://www.bilibili.com/video/BV1d44y1f7wP
+递归
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def __init__(self):
+        self.pre = TreeNode()
+
+    def convertBST(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        '''
+        倒序累加替换：  
+        [2, 5, 13] -> [[2]+[1]+[0], [2]+[1], [2]] -> [20, 18, 13]
+        '''
+        self.traversal(root)
+        return root
+
+    def traversal(self, root: TreeNode) -> None:
+        # 因为要遍历整棵树，所以递归函数不需要返回值
+        # Base Case
+        if not root: 
+            return None
+        # 单层递归逻辑：中序遍历的反译 - 右中左
+        self.traversal(root.right)  # 右
+
+        # 中节点：用当前root的值加上pre的值
+        root.val += self.pre.val    # 中
+        self.pre = root             
+
+        self.traversal(root.left)   # 左
+        
+  迭代法
+迭代法其实就是中序模板题了，在二叉树：前中后序迭代法 (opens new window)和二叉树：前中后序统一方式迭代法 (opens new window)可以选一种自己习惯的写法。
+
+这里我给出其中的一种，代码如下：
+
+class Solution {
+private:
+    int pre; // 记录前一个节点的数值
+    void traversal(TreeNode* root) {
+        stack<TreeNode*> st;
+        TreeNode* cur = root;
+        while (cur != NULL || !st.empty()) {
+            if (cur != NULL) {
+                st.push(cur);
+                cur = cur->right;   // 右
+            } else {
+                cur = st.top();     // 中
+                st.pop();
+                cur->val += pre;
+                pre = cur->val;
+                cur = cur->left;    // 左
+            }
+        }
+    }
+public:
+    TreeNode* convertBST(TreeNode* root) {
+        pre = 0;
+        traversal(root);
+        return root;
+    }
+};
+
+
+ 总结篇  
+好了，二叉树大家就这样刷完了，做一个总结吧
+https://programmercarl.com/%E4%BA%8C%E5%8F%89%E6%A0%91%E6%80%BB%E7%BB%93%E7%AF%87.html
+
+
