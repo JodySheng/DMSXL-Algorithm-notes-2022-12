@@ -1,0 +1,121 @@
+93.复原IP地址  
+本期本来是很有难度的，不过 大家做完 分割回文串 之后，本题就容易很多了 
+题目链接/文章讲解：https://programmercarl.com/0093.%E5%A4%8D%E5%8E%9FIP%E5%9C%B0%E5%9D%80.html  
+视频讲解：https://www.bilibili.com/video/BV1XP4y1U73i/
+
+class Solution:
+    def __init__(self):
+        self.result = []
+
+    def restoreIpAddresses(self, s: str) -> List[str]:
+        '''
+        本质切割问题使用回溯搜索法，本题只能切割三次，所以纵向递归总共四层
+        因为不能重复分割，所以需要start_index来记录下一层递归分割的起始位置
+        添加变量point_num来记录逗号的数量[0,3]
+        '''
+        self.result.clear()
+        if len(s) > 12: return []
+        self.backtracking(s, 0, 0)
+        return self.result
+
+    def backtracking(self, s: str, start_index: int, point_num: int) -> None:
+        # Base Case
+        if point_num == 3:
+            if self.is_valid(s, start_index, len(s)-1):
+                self.result.append(s[:])
+            return
+        # 单层递归逻辑
+        for i in range(start_index, len(s)):
+            # [start_index, i]就是被截取的子串
+            if self.is_valid(s, start_index, i):
+                s = s[:i+1] + '.' + s[i+1:]
+                self.backtracking(s, i+2, point_num+1)  # 在填入.后，下一子串起始后移2位
+                s = s[:i+1] + s[i+2:]    # 回溯
+            else:
+                # 若当前被截取的子串大于255或者大于三位数，直接结束本层循环
+                break
+    
+    def is_valid(self, s: str, start: int, end: int) -> bool:
+        if start > end: return False
+        # 若数字是0开头，不合法
+        if s[start] == '0' and start != end:
+            return False
+        if not 0 <= int(s[start:end+1]) <= 255:
+            return False
+        return True
+78.子集  
+子集问题，就是收集树形结构中，每一个节点的结果。 整体代码其实和 回溯模板都是差不多的。 
+题目链接/文章讲解：https://programmercarl.com/0078.%E5%AD%90%E9%9B%86.html  
+视频讲解：https://www.bilibili.com/video/BV1U84y1q7Ci 
+
+class Solution:
+    def __init__(self):
+        self.path: List[int] = []
+        self.paths: List[List[int]] = []
+
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        self.paths.clear()
+        self.path.clear()
+        self.backtracking(nums, 0)
+        return self.paths
+
+    def backtracking(self, nums: List[int], start_index: int) -> None:
+        # 收集子集，要先于终止判断
+        self.paths.append(self.path[:])
+        # Base Case
+        if start_index == len(nums):
+            return
+
+        # 单层递归逻辑
+        for i in range(start_index, len(nums)):
+            self.path.append(nums[i])
+            self.backtracking(nums, i+1)
+            self.path.pop()     # 回溯
+ 
+90.子集II 
+大家之前做了 40.组合总和II 和 78.子集 ，本题就是这两道题目的结合，建议自己独立做一做，本题涉及的知识，之前都讲过，没有新内容。
+不使用used数组
+
+class Solution:
+    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        path = []
+        nums.sort() # 去重需要先对数组进行排序
+
+        def backtracking(nums, startIndex):
+            # 终止条件
+            res.append(path[:])
+            if startIndex == len(nums):
+                return
+            
+            # for循环
+            for i in range(startIndex, len(nums)):
+                # 数层去重
+                if i > startIndex and nums[i] == nums[i-1]: # 去重
+                    continue
+                path.append(nums[i])
+                backtracking(nums, i+1)
+                path.pop()
+        
+        backtracking(nums, 0)
+        return res
+使用used数组
+class Solution:
+    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+        result = []
+        path = []
+        nums.sort()
+        used = [0] * len(nums)
+        def backtrack(nums, startIdx):
+            result.append(path[:])
+            for i in range(startIdx, len(nums)):
+                if i > startIdx and nums[i] == nums[i-1] and used[i-1] == 0:
+                    continue
+                used[i] = 1
+                path.append(nums[i])
+                backtrack(nums, i+1)
+                path.pop()
+                used[i] = 0
+        backtrack(nums, 0)
+        return result
+
