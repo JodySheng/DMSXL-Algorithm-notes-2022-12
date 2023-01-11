@@ -1,0 +1,177 @@
+491.递增子序列 
+本题和大家刚做过的 90.子集II 非常像，但又很不一样，很容易掉坑里。 
+https://programmercarl.com/0491.%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97.html 
+视频讲解：https://www.bilibili.com/video/BV1EG4y1h78v  
+
+Python
+python3 回溯
+
+class Solution:
+    def __init__(self):
+        self.paths = []
+        self.path = []
+
+    def findSubsequences(self, nums: List[int]) -> List[List[int]]:
+        '''
+        本题求自增子序列，所以不能改变原数组顺序
+        '''
+        self.backtracking(nums, 0)
+        return self.paths
+
+    def backtracking(self, nums: List[int], start_index: int):
+        # 收集结果，同78.子集，仍要置于终止条件之前
+        if len(self.path) >= 2:
+            # 本题要求所有的节点
+            self.paths.append(self.path[:])
+        
+        # Base Case（可忽略）
+        if start_index == len(nums):
+            return
+
+        # 单层递归逻辑
+        # 深度遍历中每一层都会有一个全新的usage_list用于记录本层元素是否重复使用
+        usage_list = set()
+        # 同层横向遍历
+        for i in range(start_index, len(nums)):
+            # 若当前元素值小于前一个时（非递增）或者曾用过，跳入下一循环
+            if (self.path and nums[i] < self.path[-1]) or nums[i] in usage_list:
+                continue
+            usage_list.add(nums[i])
+            self.path.append(nums[i])
+            self.backtracking(nums, i+1)
+            self.path.pop() 
+回溯+哈希表去重
+
+class Solution:
+    def __init__(self):
+        self.paths = []
+        self.path = []
+
+    def findSubsequences(self, nums: List[int]) -> List[List[int]]:
+        '''
+        本题求自增子序列，所以不能改变原数组顺序
+        '''
+        self.backtracking(nums, 0)
+        return self.paths
+
+    def backtracking(self, nums: List[int], start_index: int):
+        # 收集结果，同78.子集，仍要置于终止条件之前
+        if len(self.path) >= 2:
+            # 本题要求所有的节点
+            self.paths.append(self.path[:])
+        
+        # Base Case（可忽略）
+        if start_index == len(nums):
+            return
+
+        # 单层递归逻辑
+        # 深度遍历中每一层都会有一个全新的usage_list用于记录本层元素是否重复使用
+        usage_list = [False] * 201  # 使用列表去重，题中取值范围[-100, 100]
+        # 同层横向遍历
+        for i in range(start_index, len(nums)):
+            # 若当前元素值小于前一个时（非递增）或者曾用过，跳入下一循环
+            if (self.path and nums[i] < self.path[-1]) or usage_list[nums[i]+100] == True:
+                continue
+            usage_list[nums[i]+100] = True
+            self.path.append(nums[i])
+            self.backtracking(nums, i+1)
+            self.path.pop()
+
+
+46.全排列 
+本题重点感受一下，排列问题 与 组合问题，组合总和，子集问题的区别。 为什么排列问题不用 startIndex 
+https://programmercarl.com/0046.%E5%85%A8%E6%8E%92%E5%88%97.html   
+视频讲解：https://www.bilibili.com/video/BV19v4y1S79W  
+
+回溯
+
+class Solution:
+    def __init__(self):
+        self.path = []
+        self.paths = []
+
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        '''
+        因为本题排列是有序的，这意味着同一层的元素可以重复使用，但同一树枝上不能重复使用(usage_list)
+        所以处理排列问题每层都需要从头搜索，故不再使用start_index
+        '''
+        usage_list = [False] * len(nums)
+        self.backtracking(nums, usage_list)
+        return self.paths
+
+    def backtracking(self, nums: List[int], usage_list: List[bool]) -> None:
+        # Base Case本题求叶子节点
+        if len(self.path) == len(nums):
+            self.paths.append(self.path[:])
+            return
+
+        # 单层递归逻辑
+        for i in range(0, len(nums)):  # 从头开始搜索
+            # 若遇到self.path里已收录的元素，跳过
+            if usage_list[i] == True:
+                continue
+            usage_list[i] = True
+            self.path.append(nums[i])
+            self.backtracking(nums, usage_list)     # 纵向传递使用信息，去重
+            self.path.pop()
+            usage_list[i] = False
+回溯+丢掉usage_list
+
+class Solution:
+    def __init__(self):
+        self.path = []
+        self.paths = []
+
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        '''
+        因为本题排列是有序的，这意味着同一层的元素可以重复使用，但同一树枝上不能重复使用
+        所以处理排列问题每层都需要从头搜索，故不再使用start_index
+        '''
+        self.backtracking(nums)
+        return self.paths
+
+    def backtracking(self, nums: List[int]) -> None:
+        # Base Case本题求叶子节点
+        if len(self.path) == len(nums):
+            self.paths.append(self.path[:])
+            return
+
+        # 单层递归逻辑
+        for i in range(0, len(nums)):  # 从头开始搜索
+            # 若遇到self.path里已收录的元素，跳过
+            if nums[i] in self.path:
+                continue
+            self.path.append(nums[i])
+            self.backtracking(nums)
+            self.path.pop()
+
+
+
+47.全排列 II 
+本题 就是我们讲过的 40.组合总和II 去重逻辑 和 46.全排列 的结合，可以先自己做一下，然后重点看一下 文章中 我讲的拓展内容。 used[i - 1] == true 也行，used[i - 1] == false 也行 
+https://programmercarl.com/0047.%E5%85%A8%E6%8E%92%E5%88%97II.html     
+视频讲解：https://www.bilibili.com/video/BV1R84y1i7Tm
+
+class Solution:
+    def permuteUnique(self, nums: List[int]) -> List[List[int]]:
+        # res用来存放结果
+        if not nums: return []
+        res = []
+        used = [0] * len(nums)
+        def backtracking(nums, used, path):
+            # 终止条件
+            if len(path) == len(nums):
+                res.append(path.copy())
+                return
+            for i in range(len(nums)):
+                if not used[i]:
+                    if i>0 and nums[i] == nums[i-1] and not used[i-1]:
+                        continue
+                    used[i] = 1
+                    path.append(nums[i])
+                    backtracking(nums, used, path)
+                    path.pop()
+                    used[i] = 0
+        # 记得给nums排序
+        backtracking(sorted(nums),used,[])
+        return res
